@@ -1,0 +1,93 @@
+* {
+    margin: 0;
+    padding: 0;
+ }
+
+ ul {
+     padding: 0;
+     list-style: none;
+ }
+
+a {
+    height: 24px;
+    line-height: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: orange;
+}
+
+#nav{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
+}
+
+#path{
+    display: flex;
+    align-content: center;
+    gap: 1.5em;
+ }
+
+#path #menu{
+    text-decoration: none;
+    font: 1.2em sans-serif;
+}
+
+#gap{
+    padding: 0.8em;
+}
+
+#path li a{
+     overflow: hidden;
+     min-width: 50px;
+     max-width: 300px;
+     transition: all 0.2s linear 0.1s;
+     border: 1px solid #CCC;
+     border-radius: 8px;
+ }
+
+#path ul{
+    display: flex;
+    align-items: center;
+ }
+
+#path ul li{
+    display: inline-flex;
+}
+
+#arrow{
+    /*坑: 找一个箭头svg 拖着这两个容器展开-关闭*/
+}
+
+#viewSetting{
+    position: fixed;
+    right: 1%;
+    bottom: 15%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+#uploadSetting{
+    position: fixed;
+    right: 1%;
+    bottom: 6%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.button_BG{
+    display: flex;
+    width: 60px;
+    height: 60px;
+    background-color: rgb(44,154,165);
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+#upload{
+    background-color: rgba(114,17,140,0.3);
+}

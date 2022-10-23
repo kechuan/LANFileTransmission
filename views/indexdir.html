@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>磁盘选择文件下载</title>
+    <link rel='stylesheet' href='/stylesheets/font.css'/>
+    <link rel='stylesheet' href='/stylesheets/iconfont/icons.css'/>
+</head>
+
+<style type="text/css">
+ul {
+    display: flex;
+}
+
+ul li{
+    list-style: none;
+    display: flex;
+    width: 8em;
+    height: 7em;
+    gap: 3em;
+}
+
+.icons{
+    width: 6em;
+    height: 6em;
+}
+
+ul li a{
+    display: flex;
+    flex-direction: column;
+}
+
+.text{
+    text-align: center;
+}
+</style>
+
+<body>
+    <script src='js/iconfont.js'></script>
+<div class="alldom">
+    点击以访问目录
+    <ul>
+        <li>
+            <a href="http://<%= dataip %>/filelist?path=C:">
+                <svg class="icons" aria-hidden="true">
+                    <use xlink:href="#directory_md"></use>
+                </svg>
+                <span class="text">C:</span>
+            </a>
+        </li>
+
+        <li>
+           <a href="http://<%= dataip %>/filelist?path=D:">
+                <svg class="icons" aria-hidden="true">
+                    <use xlink:href="#directory_md"></use>
+                </svg>
+                <span class="text">D:</span>
+            </a>
+
+        </li>
+
+        <li>
+            <a href="http://<%= dataip %>/filelist?path=E:">
+                <svg class="icons" aria-hidden="true">
+                    <use xlink:href="#directory_md"></use>
+                </svg>
+                <span class="text">E:</span>
+            </a>
+        </li>
+
+    </ul>
+    </div>
+</body>
+</html>

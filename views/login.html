@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <link rel="stylesheet" id='register' href="">
+    <script src='/js/login_switch.js'></script>
+    
+</head>
+<body>
+
+    <main class="container">
+        <h2 id='title'>Login</h2>
+        <h3><%= status %> <%= description %></h3>
+        <form action="">
+            <div id='input_form'>
+                <div class="input-field" id='username'>
+                    <input type="text" name="username" id="username"
+                        placeholder="Enter Your Username" autocomplete="off">
+                    <div class="underline"></div>
+                </div>
+
+                <div class="input-field" id='password'>
+                    <input type="password" name="password" id="password"
+                        placeholder="Enter Your Password" autocomplete="off">
+                    <div class="underline"></div>
+                </div>
+
+            </div>
+            
+
+            <input type="submit" value="Login in">
+        </form>
+
+        <div class="footer">
+            <span>Or <a href="javascript:void(0)" onclick='register_switch()'>Register</a> a new account?
+            </span>
+        </div>
+    </main>
+
+    <ready>
+        <div class="input-field" id='register_password'>
+                <input type="password" name="password_confirm" id="password"
+                    placeholder="Enter Your Password Again">
+                <div class="underline"></div> 
+        </div>
+    </ready>
+
+
+    <login>
+        <span>
+            Already Has a Account? <a href='javascript:void(0)' onclick='register_switch()'>Login in!</a>
+        </span>
+    </login>
+
+    <register></register>
+
+
+
+</body>
+</html>

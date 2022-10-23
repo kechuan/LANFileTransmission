@@ -1,0 +1,11 @@
+form .input-field {
+    margin-bottom: 1.5rem;
+}
+
+form #register_password{
+    display: block;
+}
+
+form input[type="submit"]{
+    content: value:"register it";
+}

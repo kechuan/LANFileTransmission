@@ -1,0 +1,66 @@
+ ul li.folder, ul li.file {
+     display: flex;
+     width: 100px;
+     justify-content: flex-end;
+     flex-direction: column;
+ }
+
+ a.folder {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0px;
+    overflow: hidden;
+    color: #595c5f;
+    font-size: 12px;
+    justify-content: center;
+    width: 100px;
+    height: 115px;
+     
+}
+
+#information{
+    display: none;
+}
+
+#files{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+}
+
+#dirlist, #filelist{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2em;
+}
+
+.dirname{
+    border: 1px solid #ccc;
+    height: 20px;
+}
+
+.filename{
+   width: 100px;
+   height: 38px;
+}
+
+.filesize{
+    display: none;
+}
+
+
+ #text{
+    display: flex;
+    align-content: center;
+    font-size: 1.3em;
+ }
+
+
+#grid_view{
+    display: block;
+}
+
+#list_view{
+    display: none;
+}

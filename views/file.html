@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>局域网传输</title>
+    <link rel='stylesheet' href='/stylesheets/font.css'/>
+    <link rel="stylesheet" href="/stylesheets/file.css">
+    <link rel="stylesheet" id='view' href="/stylesheets/<%= view %>.css">
+    <link rel="stylesheet" href="/stylesheets/iconfont/icons.css">
+</head>
+
+<body>
+    <script src='/js/view.js'></script>
+    <script src='/js/iconfont.js'></script>
+<!--文件夹显示效果-->
+<!-- test:D:\\All Local Downloads\\MobileFile -->
+ <div id="nav">kechuan的文件分享页面 TODO:上传功能/Admin下的删除功能/通过::before ::after实现图片未加载的处理
+ /继承切换视图后的scrollview位置</div>
+ <div id="path">
+    <!-- (当前分割符:<%=filepath.split('\\').length-2%> <%=filepath.split('\\')%>) -->
+    <a href="/file" id='menu'>Index🏠</a>
+    <ul>
+        <% for(var i=0; i<= filepath.split('\\').length-2; i++){ %> 
+            <li>
+                <%var array = []; var string = []%>
+
+                <a href="http://<%= dataip %>/filelist?path=<% for(var j=0; j<=i; j++){%><%array.push(filepath.split('\\')[j])%><%string.push(array);string.join('\\')%><%}%><%=string[i].toString().replace(/\,/g,'\\')%>"><%= array[i] %>                  
+                </a>
+            </li>
+            
+            <div id="text">/</div> 
+        <%}%>
+    </ul>
+ </div> 
+<div id="gap"></div>
+<div id="files">
+<!-- 文件夹显示 -->
+    <ul id='information'>
+        <li id='name'></li>
+        <li id='size'></li>
+    </ul>
+
+    <ul id='dirlist'>
+        <!-- 根据index.js获取的数组长度返回文件列表 -->
+        <% for(var i=0; i<= dirlist.length-1; i++){ %>
+            <a href="http://<%= dataip %>/filelist?path=<%= dirlist[i] %>" class="folder" >
+                <svg class="icons" aria-hidden="true">
+                  <use xlink:href="#directory_md"></use>
+                </svg>
+
+                <li class="folder">  
+                    <div class="dirname"><%= dirnamelist[i] %></div>
+                    <div class="filesize">—</div>   
+                </li>
+            </a>
+                
+        <%}%>
+    </ul>
+
+<!--文件显示-->
+    <ul id='filelist'>
+        <% for(var i=0; i<= filelist.length-1; i++){ %>
+            <a href="http://<%= dataip %>/filedownload?path=<%= filelist[i] %>" class="folder"> 
+                <svg class="icons" aria-hidden="true">
+                    <%#var filename = decodeURIComponent(filelist[i])%>
+                    <%var video_fliter = /\.mkv|mp4|flv|webv|m2ts|rmvb$/%>
+                    <%var audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac$/%>
+                    <%var picture_fliter = /\.jpe?g|png|bmp|webp$/%>
+                    <%var compress_fliter = /\.zip|rar|7z|\d{2}$/%>
+                    <%var text_fliter = /\.txt|md|lrc|ini|json|cfg$/%>
+
+                    <use xlink:href="
+                        <%if(video_fliter.test(extlist[i])){%>
+                        <%="#ext-video"%>
+                        <%}else if(audio_fliter.test(extlist[i])){%>
+                        <%="#ext-audio"%>
+                        <%}else if(picture_fliter.test(extlist[i])){%>
+                        <%="#ext-picture"%>
+                        <%}else if(text_fliter.test(extlist[i])){%>
+                        <%="#ext-txt"%>
+                        <%}else if(compress_fliter.test(extlist[i])){%>
+                        <%="#ext-compress"%>
+                        <%}else{%>
+                        <%="#ext-unknown"%>
+                        <%}%>">  
+                    </use> 
+                    
+                </svg>
+
+                <li class="file"> 
+                    <div class="filename">
+                        <%if(filenamelist[i].length>100){%>
+                        <% var overflow = (filenamelist[i]).slice(0,100) %>
+                        <%= `${overflow}...` %>
+                        
+
+                        <%}else{%>
+                        <%= filenamelist[i] %>
+
+                        <%}%>
+                    </div>
+
+                    <div class="filesize">
+                        <% if(sizelist[i]<1024){ %>
+                        <%= `${sizelist[i]}B` %>
+                        <%}else if(sizelist[i]<Math.pow(1024, 2)){%>
+                        <%= `${(sizelist[i]/1024).toFixed(2)}KB`%>
+                        <%}else if(sizelist[i]<Math.pow(1024, 3)){%>
+                        <%= `${(sizelist[i]/Math.pow(1024, 2)).toFixed(2)}MB`%>
+                        <%}else{%>
+                        <%= `${(sizelist[i]/Math.pow(1024, 3)).toFixed(2)}GB`%>
+                        <%}%>
+
+                    </div>
+                </li>
+            </a>
+       
+        <%}%>
+    </ul>
+</div>
+
+<!-- #ext-video -->
+
+<div id="viewSetting">
+    <a href="/view/<% if(view=="gridview"){%><%="listview"%><%}else{%><%="gridview"%><%}%>">
+        <div class='button_BG'>
+            <div id="grid_view">
+                <img src="/images/svg/gridview.svg"></img>
+            </div>
+            
+            <div id="list_view">
+                <img src="/images/svg/listview.svg"></img>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div id="uploadSetting">
+    <a href="/upload">
+        <div class='button_BG' id='upload'>
+            <img src="/images/svg/upload.svg">
+        </div>
+    </a>
+</div>
+
+
+<div id="gap"></div>
+
+图标展示框
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-video"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#directory"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#directory_md"></use>
+</svg>
+
+计划:
+图标自定义
+深浅背景间隔
+
+</body>
+</html>
