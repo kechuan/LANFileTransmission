@@ -3,7 +3,6 @@ import path from 'node:path'
 import fs from "node:fs"
 import os from "node:os"
 import process from "node:process"
-// import async from 'async' //async await无法在router配置上使用？？？
 
 import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js'
 
@@ -15,10 +14,6 @@ var port = 8888;
 process.traceDeprecation = true
 
 //转变class构造存储 希望以后以账号偏好设置继承数据能够用得上 比如stat extend passport之类的操作
-
-function test(){
-    return 'listview'
-}
 
 class defaultConfig{
     constructor(){
@@ -49,30 +44,34 @@ var password_confirm = req.query.password_confirm
 
     if(username&&password&&password_confirm!=undefined){
         res.redirect(`/register?username=${username}&password=${password}`)
+        return;
     }
 
     if(username&&password!=undefined){
-        console.log('try login');
         switch(login(username,password)){
             case 'not exist': {
                 Now.description = `Account ${req.query.username} not exist!`
-                res.redirect('/login/failed') 
+                res.redirect('/login/failed')
+                return; //提前return抛出避免重复导向
                 break;
+                
             }
 
             case 'wrong': {
                 Now.description = `The password or account is not correct!`
                 res.redirect('/login/failed')
+                return; //提前return抛出避免重复导向
                 break;
+                
             }; 
 
             case 'succ': {
-                
                 Now.view = preferSetting(username)
                 console.log(`welcome ${req.query.username}! your view:${preferSetting(username)}`)
-                
                 res.redirect('/index')
+                return; //提前return抛出避免重复导向
                 break;
+                
             };
 
             // default: console.log(login(username,password)); break;
@@ -174,15 +173,79 @@ router.get('/filelist', function (req, res, next) {
 
 //上传要干什么？ 我建议呼出一个独立的弹窗 最好有css 这点可以抄github的 如果可以的话
 //引入一点css框架吧 是时候该知道怎么用那些css框架了
-router.get('/upload', (req, res)=>{
-    res.redirect('/file')
+
+router.post('/upload', (req, res)=>{
+  let sampleFile;
+  // let uploadPath;
+  let uploadPath = Now.surfing_path
+  // console.log("surfing_path:"+Now.surfing_path)
+  // console.log("uploadPath:"+uploadPath)
+  uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
+    console.log("SplitPath:"+uploadPath);
+
+
+  //无文件传入时处理
+  if (!req.files || Object.keys(req.files).length === 0) {
+    res.status(400).send('No files were uploaded.');
+    return;
+  }
+
+  sampleFile = req.files.sampleFile;
+
+  console.log('req.files >>>', req.files); // eslint-disable-line
+
+  
+
+  
+
+  //执行多文件流程处理
+  
+
+  //处理的方式也很粗暴 直接执行for循环拆分开来一个个上传就是
+  if(sampleFile.length!=undefined){
+    console.log("本次传入的文件数目:",sampleFile.length)
+    for(let index of sampleFile){
+        let FullNameUpload = uploadPath+"\\"+index.name;
+        console.log("SplitPath2:"+FullNameUpload);
+
+        index.mv(FullNameUpload, function(err) {
+            if (err) {
+              return res.status(500).send(err);
+            }
+
+            FullNameUpload = uploadPath; //重置
+        });
+    }
+    res.send('File uploaded to ' + uploadPath);
+  }
+
+  else{
+        let FullNameUpload = uploadPath+"\\"+sampleFile.name;
+        console.log("SplitPath2:"+FullNameUpload);
+
+        sampleFile.mv(FullNameUpload, function(err) {
+            if (err) {
+              return res.status(500).send(err);
+            }
+        });
+        
+        res.send('File uploaded to ' + uploadPath);
+    }
+    
+    
 })
+
+
+//既然你下载是别人客户端发起的多线程下载
+
+//那么上传就只能靠服务端写的js来执行多线程上传?
 
 
 //下载文件 当访问到/filedownload的时候express直接跳出下载
 //比如:"http://192.168.1.144:8888/filedownload?path=E:\"
 //顺带一提 如果直接filedownload访问文件夹/硬盘 是直接会没有响应的
-//因此对于文件夹来说 才会接入filelist
+
+//因此对于文件夹界面来说 才会接入filelist来调用filedownload 实际上也是调用目录给filedownlad
 
 router.get('/filedownload', function (req, res) {
     //EXP:/filedownload?path=D:\All%20Local%20Downloads\
@@ -200,10 +263,11 @@ router.get('/filedownload', function (req, res) {
 
 //这样 如果要精简json文件 那最好的做法自然就是先做一份deafult_options.json
 //然后再让每个profile里写偏好设置(prefer)
+
 router.get('/view/:view', (req,res)=>{
     let redirect_path = Now.surfing_path
     Now.view = req.params.view; //全局属性 不能用var 获取伪类选择的属性
-    req.session.view = Now.view
+    req.session.view = Now.view //session需求
 
     res.redirect(redirect_path)
 })
@@ -258,15 +322,12 @@ var [informationlist,dirlist,filelist,sizelist,extlist] = [[],[],[],[],[]];
  * @param res
  */
 function downloadFile(filepath, res, req) {
-    // console.log(filepath)
-    var filepathTemp = filepath.split("\\");
-    
-    // var filename = filepathTemp[filepathTemp.length - 1];
-    var filename = filepathTemp[-1];
+    var filename = filepath.split("\\")[-1]; //截取目录的尾部(文件名)信息
     res.download(filepath, filename, (err)=>{
         if (err) {
             console.log(err);
-        } else {
+        } 
+        else {
             console.log('Send', filename, 'To:', req.ip, 'Success');
         }
     });

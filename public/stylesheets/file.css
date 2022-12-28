@@ -68,14 +68,7 @@ a {
     align-items: flex-start;
 }
 
-#uploadSetting{
-    position: fixed;
-    right: 1%;
-    bottom: 6%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-}
+
 
 .button_BG{
     display: flex;
@@ -88,6 +81,3 @@ a {
     cursor: pointer;
 }
 
-#upload{
-    background-color: rgba(114,17,140,0.3);
-}

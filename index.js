@@ -5,7 +5,7 @@ import open from 'open'
 import world from './test.cjs'
 var port = process.env.PORT || '8888';
 
-var server = http.createServer(app);
+var server = http.createServer(app); //server内容:app
 server.listen(port, ()=>{
   console.log(`请输入连接地址:${getIPAdress()}:${port}/file`);
   console.log(world.world(), 'cjs & ejs import test')

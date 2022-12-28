@@ -1,0 +1,29 @@
+#uploadButton{
+    background-color: rgba(114,17,140,0.3);
+}
+
+#uploadSetting{
+    position: fixed;
+    right: 1%;
+    bottom: 6%;
+    display: flex;
+}
+
+
+#uploadOptions{
+	position: fixed;
+	height: 600px;
+	width: 60%;
+	top: 8%;
+	left: 20%;
+	border: 1px solid black;
+	transition: linear 0.5s;
+	border-radius: 15px;
+}
+
+@media (max-width: 872px) {
+        uploadOptions{
+            /*width: 730px;*/
+            width: 550px;
+        }
+}
