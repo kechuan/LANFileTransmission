@@ -1,4 +1,5 @@
 import express from 'express'
+import expressWs from 'express-ws'
 import path from 'node:path'
 import favicon from 'serve-favicon'
 import logger from 'morgan'
@@ -15,8 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url)); //node-esm环境转�
 import {router as routes} from './routes/index.js'
 
 var app = express();
-
-
+expressWs(app) //将ws引入至app中
 
 // view engine:
 

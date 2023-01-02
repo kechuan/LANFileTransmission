@@ -4,6 +4,7 @@ import fs from "node:fs"
 import os from "node:os"
 import process from "node:process"
 
+
 import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js'
 
 // var cookieParser = require('cookie-parser')
@@ -30,8 +31,8 @@ class prefer extends defaultConfig{
 
 var Now = new prefer()
 
-router.get('/setcookies', (req, res) => {
-    res.send('cookies setted!')
+router.get('/ping', (req, res) => {
+    console.log('pong')
 })
 
 router.get('/',(req,res)=>{
@@ -164,7 +165,7 @@ router.get('/filelist', function (req, res, next) {
         filenamelist: filenamelist,
         sizelist: sizelist,
         extlist: extlist
-        // 为什么 即使它们不主动去传递 ejs也能接收到变量？
+        // 为什么在cjs的时候 即使它们不主动去传递 ejs也能接收到变量？
         //最搞笑的是转成ES导入之后就需要强制声明这些变量了
     });
     //将res的变量映射到ejs模板 以供调用
@@ -175,11 +176,9 @@ router.get('/filelist', function (req, res, next) {
 //引入一点css框架吧 是时候该知道怎么用那些css框架了
 
 router.post('/upload', (req, res)=>{
-  let sampleFile;
-  // let uploadPath;
-  let uploadPath = Now.surfing_path
-  // console.log("surfing_path:"+Now.surfing_path)
-  // console.log("uploadPath:"+uploadPath)
+  let targetFile; //目标文件
+  let uploadPath = Now.surfing_path //默认指定上传目录就在当前的浏览目录里 也许很久以后才会添加自定义目录浏览
+
   uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
     console.log("SplitPath:"+uploadPath);
 
@@ -190,46 +189,45 @@ router.post('/upload', (req, res)=>{
     return;
   }
 
-  sampleFile = req.files.sampleFile;
+  targetFile = req.files.Files; //此处的Files是对应着input表格当中的name属性 同样可以从req.files里看到
 
   console.log('req.files >>>', req.files); // eslint-disable-line
 
-  
-
-  
-
-  //执行多文件流程处理
-  
+  //执行单多文件流程处理
 
   //处理的方式也很粗暴 直接执行for循环拆分开来一个个上传就是
-  if(sampleFile.length!=undefined){
-    console.log("本次传入的文件数目:",sampleFile.length)
-    for(let index of sampleFile){
-        let FullNameUpload = uploadPath+"\\"+index.name;
-        console.log("SplitPath2:"+FullNameUpload);
+    if(targetFile.length!=undefined){
+        console.log("本次传入的文件数目:",targetFile.length)
+        for(let index of targetFile){
+            let FullNameUpload = uploadPath+"\\"+index.name;
+            console.log("SplitPath2:"+FullNameUpload);
 
-        index.mv(FullNameUpload, function(err) {
-            if (err) {
-              return res.status(500).send(err);
-            }
+            index.mv(FullNameUpload, function(err) {
+                if (err) {
+                  return res.status(500).send(err);
+                }
 
-            FullNameUpload = uploadPath; //重置
-        });
+                FullNameUpload = uploadPath; //重置
+            });
+        }
+        // res.send('File uploaded to ' + uploadPath);
+        console.log('File uploaded to ' + uploadPath)
+        res.redirect(Now.surfing_path);
     }
-    res.send('File uploaded to ' + uploadPath);
-  }
 
-  else{
-        let FullNameUpload = uploadPath+"\\"+sampleFile.name;
+    else{
+        let FullNameUpload = uploadPath+"\\"+targetFile.name;
         console.log("SplitPath2:"+FullNameUpload);
 
-        sampleFile.mv(FullNameUpload, function(err) {
+        targetFile.mv(FullNameUpload, function(err) {
             if (err) {
               return res.status(500).send(err);
             }
         });
-        
-        res.send('File uploaded to ' + uploadPath);
+
+        // res.send('File uploaded to ' + uploadPath);
+        console.log('File uploaded to ' + uploadPath)
+        res.redirect(Now.surfing_path);
     }
     
     
@@ -309,7 +307,6 @@ var [informationlist,dirlist,filelist,sizelist,extlist] = [[],[],[],[],[]];
             }
         }
 
-        
     });
     
     informationlist.push(dirlist, filelist, sizelist, extlist)
@@ -325,7 +322,10 @@ function downloadFile(filepath, res, req) {
     var filename = filepath.split("\\")[-1]; //截取目录的尾部(文件名)信息
     res.download(filepath, filename, (err)=>{
         if (err) {
-            console.log(err);
+            // console.log(err.code);
+            switch(err.code){
+                case 'ECONNABORTED': {console.log("waitting user start download...");break;}
+            }
         } 
         else {
             console.log('Send', filename, 'To:', req.ip, 'Success');

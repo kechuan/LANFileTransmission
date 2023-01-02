@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/stylesheets/iconfont/icons.css">
     <link rel="stylesheet" href="/stylesheets/upload.css">
 
+
 </head>
 
 <body>
@@ -15,24 +16,36 @@
     <script src='/js/iconfont.js'></script>
     <script src='/js/uploadSetting.js'></script>
 
+
 <!--文件夹显示效果-->
 <!-- test:D:\\All Local Downloads\\MobileFile -->
-    
 
- <div id="uploadOptions" style="visibility: hidden;">
-        <form ref='uploadForm' 
-            id='uploadForm' 
-            action='/upload' 
-            method='post' 
-            encType="multipart/form-data">
-                <input type="file" name="sampleFile" multiple="multiple" />
-                <input type='submit' value='Upload!' />
-        </form>     
- </div>
+    <section class="upload-container" style="visibility: hidden;">
+        <div id="uploadNav">
+            <div id="closeUploadButton" onclick="visible()">
+                <img src="/images/svg/closeButton.svg">
+            </div>
+        </div>
+        
+        <form ref='uploadForm' action="/upload" id='uploadForm' method='post' encType="multipart/form-data">
+            <div class="drop-zone">
+                <div class="icon-container">
+                    <img src="/images/svg/uploadFile.svg" draggable="false" class="center" alt="File Icon">
+                </div>
 
- <div id="nav">kechuan的文件分享页面 <br>
-    TODO:上传功能/Admin下的删除功能/通过::before ::after实现图片未加载的处理 <br>
- /继承切换视图后的scrollview位置</div>
+                <input type="file" name="Files" id="fileInput" multiple="multiple">
+                <input type='submit' value='Upload!' id="fileUpload">
+
+                <div class="title">Drop your Files here or, <span id="browseBtn">browse</span></div>
+            </div>
+        </form>
+
+    </section>
+
+ <div id="nav">kechuan的文件分享页面</div>
+
+ <!-- TODO:Admin下的删除功能/通过::before ::after实现图片未加载的处理 <br>
+ /继承切换视图后的scrollview位置 -->
  <div id="path">
     <!-- (当前分割符:<%=filepath.split('\\').length-2%> <%=filepath.split('\\')%>) -->
     <a href="/file" id='menu'>Index🏠</a>
@@ -141,29 +154,29 @@
 
 
 <!-- #ext-video -->
-
-<div id="viewSetting">
-    <a href="/view/<% if(view=="gridview"){%><%="listview"%><%}else{%><%="gridview"%><%}%>">
-        <div class='button_BG'>
-            <div id="grid_view">
-                <img src="/images/svg/gridview.svg"></img>
+<div id="setting">
+    <div id="viewSetting">
+        <a href="/view/<% if(view=="gridview"){%><%="listview"%><%}else{%><%="gridview"%><%}%>">
+            <div class='button_BG'>
+                <div id="grid_view">
+                    <img src="/images/svg/gridview.svg"></img>
+                </div>
+                
+                <div id="list_view">
+                    <img src="/images/svg/listview.svg"></img>
+                </div>
             </div>
-            
-            <div id="list_view">
-                <img src="/images/svg/listview.svg"></img>
+        </a>
+    </div>
+
+    <div id="uploadSetting" onclick="visible()">
+        <a>
+            <div class='button_BG' id='uploadButton'>
+                <img src="/images/svg/uploadButton.svg">
             </div>
-        </div>
-    </a>
+        </a>
+    </div>
 </div>
-
-<div id="uploadSetting" onclick="visible()">
-    <a>
-        <div class='button_BG' id='uploadButton'>
-            <img src="/images/svg/upload.svg">
-        </div>
-    </a>
-</div>
-
 
 
 

@@ -31,13 +31,12 @@ a.folder {
 
 .dirname{
     position: absolute;
-    left: 10%;
+    left: 7%;
 }
 
 .filename{
-
     position: absolute;
-    left: 10%;
+    left: 7%;
     overflow: hidden;
 }
 
@@ -80,10 +79,16 @@ a.folder {
 
 /*最小xxx px才不会触发 或者直接让css完全固定 @media screen*/
 
-@media (max-width: 872px) {
+@media (max-width: 1200px) {
         body{
             /*width: 730px;*/
             width: 756px;
         }
+
+        .dirname, .filename{
+            left: 11%;
+        }
+
+
 }
 
