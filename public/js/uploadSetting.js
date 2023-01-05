@@ -1,15 +1,19 @@
 const $ = document.querySelector.bind(document);
-var initalflag = 0;
+var Initalflag = 0;
 var uploadOptions,dropzone,title,browseBtn,fileInput,fileUpload;
+var uploadForm;
 
-window.onload = function inital(){
-	if(!initalflag){
+window.onload = function Inital(){
+	if(!Initalflag){
 		uploadOptions = $(".upload-container")
 		dropzone = $(".drop-zone")
 		title = $(".drop-zone .title")
 		browseBtn = $("#browseBtn")
 		fileInput = $("#fileInput")
 		fileUpload = $("#fileUpload")
+		dirsection = $('.dirsection')
+		filesection = $('.filesection')
+		
 
 		/*
 		如果直接用dragover触发频率太高
@@ -34,16 +38,19 @@ window.onload = function inital(){
 		});
 
 		dropzone.addEventListener("drop", (event) => { //dropZone监听drop行为
-			event.preventDefault(); //阻止默认事件执行
+			event.preventDefault(); //阻止默认事件执行——打开文件
+			
+
 			dropzone.classList.remove("dragging");
-			const files = event.dataTransfer.files;
+			var files = event.target.files || event.dataTransfer.files;
 			fileInput.files = files; //子属性files代表input传入的文件
 
 			console.log(`dragged ${files[0].name}`)
-			fileUpload.click();
-			//同理 不过这里是移除掉dragged的classname
-			
+			formDataUpload(files);
+			// futch('/upload').then(console.log)
 		})
+
+			
 
 		browseBtn.addEventListener("click", () => {
 			event.preventDefault();
@@ -52,56 +59,64 @@ window.onload = function inital(){
 
 		//无论是拖拽还是browse 所指向的都是让input的属性改变这个行为
 
-		fileInput.addEventListener("change", () => {
+		fileInput.addEventListener("input", () =>{
 			event.preventDefault();
-  			fileUpload.click();
-		});
+			console.log("something input in fileInput.")
 
-		initalflag = 1;
-		console.log("inital complete.")
+			uploadForm = $('#uploadForm') //当前form的数据
+			
+			// fileInput.click();
+		})
+
+	Initalflag = 1;
+	console.log("inital complete.")
+		
 	}
-}//等待DOM元素加载完毕开始执行
+
+	
+}
+//等待DOM元素加载完毕开始执行
+
+function futch(url, opts={}, onProgress) {
+    return new Promise( (res, rej)=>{
+        var xhr = new XMLHttpRequest();
+        xhr.open(opts.method || 'get', url);
+        for (var k in opts.headers||{})
+            xhr.setRequestHeader(k, opts.headers[k]);
+        xhr.onload = e => res(e.target.responseText);
+        xhr.onerror = rej;
+        if (xhr.upload && onProgress)
+            xhr.upload.onprogress = onProgress; // event.loaded / event.total * 100 ; //event.lengthComputable
+        xhr.send(opts.body);
+    });
+}
 
 
-// const uploadFile = () => {
-//   console.log("file added uploading");
 
-//   files = fileInput.files;
-//   const formData = new FormData();
-//   formData.append("myfile", files[0]);
+function formDataUpload(files){
+	uploadForm = $('#uploadForm') //当前form的数据
+	let formData = new FormData(uploadForm);
+   	// formData.append('Files',files[0]) //?文件测试 当然 你也可以即时添加一个input 冠以其他名字进行上传
+   	console.log(files[0].length)
+	
+	fetch("/upload",{
+		//options
+	    method: "POST",
+	    headers: {
+		       // 'Content-Type': 'application/x-www-form-urlencoded' //解析表单数据formdata
+	    },
+	    body:formData,
+	    dataType:"text"
+	})
+			
+		//callback
+		.then((res)=>{return res.json()})
+		.then((res)=>{
+			alert(res.message)
+		})	
+		//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
+}
 
-//   //show the uploader
-//   progressContainer.style.display = "block";
-
-//   // upload file
-//   const xhr = new XMLHttpRequest();
-
-//   // listen for upload progress
-//   xhr.upload.onprogress = function (event) {
-//     // find the percentage of uploaded
-//     let percent = Math.round((100 * event.loaded) / event.total);
-//     progressPercent.innerText = percent;
-//     const scaleX = `scaleX(${percent / 100})`;
-//     bgProgress.style.transform = scaleX;
-//     progressBar.style.transform = scaleX;
-//   };
-
-//   // handle error
-//   xhr.upload.onerror = function () {
-//     showToast(`Error in upload: ${xhr.status}.`);
-//     fileInput.value = ""; // reset the input
-//   };
-
-//   // listen for response which will give the link
-//   xhr.onreadystatechange = function () {
-//     if (xhr.readyState == XMLHttpRequest.DONE) {
-//       onFileUploadSuccess(xhr.responseText);
-//     }
-//   };
-
-//   xhr.open("POST", uploadURL);
-//   xhr.send(formData);
-// };
 
 
 /*

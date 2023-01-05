@@ -10,21 +10,56 @@ a.folder {
     color: #595c5f;
     font-size: 12px;
     width: 77.5px;
-    height: 35px;
+    height: 38px;
     flex-direction: row;
 }
 
 #files{
+    background-color: #B9CB3343;
     display: flex;
     flex-wrap: wrap;
     gap: 1.5em;
     flex-direction: column;
 }
 
-#dirlist, #filelist{
+#status{
+    background-color: #12BFEC25;
+    font-family: system-ui;
+    display: flex;
+    height: 2em;
+    
+
+}
+
+.row-gap{
+    width: 3em;
+}
+
+.tiny{
+    width: 3em;
+}
+
+.full{
+    flex: 1 0 auto;
+}
+
+
+#icon{
+
+}
+
+#name{
+
+}
+
+#size{
+    /*flex: 1 0 auto;*/
+}
+
+#dirlist, #fileslist{
     position: relative;
     display: flex;
-    gap: 2em;
+    gap: 1.8em;
     flex-direction: column;
     overflow: hidden;
 }
@@ -43,7 +78,15 @@ a.folder {
 .filesize{
     display: inline;
     position: absolute;
-    right: 6%;
+    right: 0%;
+}
+
+/*.dirsection{
+    background-color: #F77C0746;
+}*/
+
+.filesection:hover, .dirsection:hover{
+    background-color: #B9CB3338;
 }
 
 
@@ -52,7 +95,6 @@ a.folder {
     align-content: center;
     font-size: 1.3em;
 }
-
 
 
 #view_change{

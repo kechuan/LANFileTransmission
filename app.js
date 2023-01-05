@@ -1,5 +1,5 @@
 import express from 'express'
-import expressWs from 'express-ws'
+// import expressWs from 'express-ws'
 import path from 'node:path'
 import favicon from 'serve-favicon'
 import logger from 'morgan'
@@ -13,10 +13,10 @@ import fileUpload from 'express-fileupload/lib/index.js' //默认状态下 目�
 
 const __dirname = dirname(fileURLToPath(import.meta.url)); //node-esm环境转换
 
-import {router as routes} from './routes/index.js'
+import {router as routes} from './routes/main.js'
 
 var app = express();
-expressWs(app) //将ws引入至app中
+// expressWs(app) //将ws引入至app中
 
 // view engine:
 
@@ -43,6 +43,7 @@ app.use(logger('dev')); //显示用户访问行为 访问资源目录 状态码 
 app.use(fileUpload({
     defParamCharset: "utf8", //调整fileupload的form依赖->busboy:defParamCharset:utf8
     limits: { fileSize: 100 * 1024 * 1024 } //Limit Size:100MB
+    // debug:true
 })); 
 
 //session 原本是临时替代账户系统的一些偏好设置 但是现在反而不知道有什么用了

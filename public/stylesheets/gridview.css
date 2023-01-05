@@ -18,17 +18,17 @@
      
 }
 
-#information{
-    display: none;
+#status, #information{
+    visibility: hidden;
 }
 
 #files{
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5em;
+    row-gap: 1.5em;
 }
 
-#dirlist, #filelist{
+#dirlist, #fileslist{
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;

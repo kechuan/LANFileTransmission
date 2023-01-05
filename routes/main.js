@@ -3,7 +3,7 @@ import path from 'node:path'
 import fs from "node:fs"
 import os from "node:os"
 import process from "node:process"
-
+import fetch from 'fetch'
 
 import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js'
 
@@ -31,8 +31,16 @@ class prefer extends defaultConfig{
 
 var Now = new prefer()
 
-router.get('/ping', (req, res) => {
-    console.log('pong')
+router.post('/ping', (req, res) => {
+let response = {
+        code: 200,
+        message: "pong"
+    }
+    res.json(response)
+})
+
+router.get('/Lab', (req, res) => {
+    res.render('Lab', {title: 'Lab'}); //测试页面
 })
 
 router.get('/',(req,res)=>{
@@ -98,18 +106,20 @@ router.get('/register',(req,res)=>{
     if(profileScan(req.query.username,req.query.password)){
         console.log('reg failed!')
         res.redirect('/login/failed')
+        return;
     }
 
     else{
         res.redirect('/index')
         profileWrite(req.query.username,req.query.password)
+        return;
         
     }
 })
 
 router.get('/index', function (req, res, next) {
     var reqIp = getIPAdress() +':'+port;
-    res.render('test', 
+    res.render('index', 
     {
         title: 'Express',
         dataip: reqIp,
@@ -127,7 +137,7 @@ router.get('/file', function (req, res, next) {
 //文件列表 需求通过上层携带 ?path='' 以访问 直接访问无效 由file跳转以携带字样
 
 //因主要功能都在这个页面实现 所以考虑直接在这个页面内添加传送标记节点 surfing_path
-router.get('/filelist', function (req, res, next) {
+router.get('/fileslist', function (req, res, next) {
     Now.surfing_path = req.url 
     let filepath = req.query.path.slice(2); //截取盘符之后的目录信息
     let path = req.query["path"];
@@ -138,14 +148,14 @@ router.get('/filelist', function (req, res, next) {
 
     var filedetail = informationList(filepath);
     //数据解构法赋值
-    var [dirlist,filelist,sizelist,extlist] = filedetail
+    var [dirlist,fileslist,sizelist,extlist] = filedetail
     
     //处理文件名显示问题
     var filenamelist = new Array();
     var dirnamelist = new Array();
 
-    for (var i=0;i<filelist.length;i++){
-        var temp = decodeURIComponent(filelist[i])
+    for (var i=0;i<fileslist.length;i++){
+        var temp = decodeURIComponent(fileslist[i])
         filenamelist[i] = temp.split('\\').slice(-1).toString();   
         //浅复制最后一位的slice 但是会变成数组的形式 需要手动转换一次变成字符串
     }
@@ -159,7 +169,7 @@ router.get('/filelist', function (req, res, next) {
         dataip: reqIp,
         filepath: filepath,
         view: Now.view,
-        filelist: filelist,
+        fileslist: fileslist,
         dirlist: dirlist,
         dirnamelist: dirnamelist,
         filenamelist: filenamelist,
@@ -176,26 +186,26 @@ router.get('/filelist', function (req, res, next) {
 //引入一点css框架吧 是时候该知道怎么用那些css框架了
 
 router.post('/upload', (req, res)=>{
-  let targetFile; //目标文件
-  let uploadPath = Now.surfing_path //默认指定上传目录就在当前的浏览目录里 也许很久以后才会添加自定义目录浏览
+    let targetFile; //目标文件
 
-  uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
+    //默认指定上传目录就在当前的浏览目录里 也许很久以后才会添加自定义目录浏览
+    let uploadPath = Now.surfing_path 
+
+    uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
     console.log("SplitPath:"+uploadPath);
 
 
   //无文件传入时处理
-  if (!req.files || Object.keys(req.files).length === 0) {
-    res.status(400).send('No files were uploaded.');
-    return;
-  }
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
 
-  targetFile = req.files.Files; //此处的Files是对应着input表格当中的name属性 同样可以从req.files里看到
+    targetFile = req.files.Files; //此处的Files是对应着input表格当中的name属性 同样可以从req.files里看到
 
-  console.log('req.files >>>', req.files); // eslint-disable-line
+    console.log('req.files >>>', req.files); // eslint-disable-line
 
-  //执行单多文件流程处理
-
-  //处理的方式也很粗暴 直接执行for循环拆分开来一个个上传就是
+    //执行单多文件流程处理
+    //处理的方式也很粗暴 直接执行for循环拆分开来一个个上传就是
     if(targetFile.length!=undefined){
         console.log("本次传入的文件数目:",targetFile.length)
         for(let index of targetFile){
@@ -207,12 +217,20 @@ router.post('/upload', (req, res)=>{
                   return res.status(500).send(err);
                 }
 
+                console.log(`File: ${index.name} Size: ${(index.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
                 FullNameUpload = uploadPath; //重置
             });
         }
-        // res.send('File uploaded to ' + uploadPath);
-        console.log('File uploaded to ' + uploadPath)
-        res.redirect(Now.surfing_path);
+        
+        // console.log('File uploaded to ' + uploadPath)
+
+        let response = {
+            code: 200,
+            message: `${targetFile.length} files uplpoad Success`
+        }
+
+        return res.json(response)
+        // return res.status(400).send('No files were uploaded.');
     }
 
     else{
@@ -225,9 +243,16 @@ router.post('/upload', (req, res)=>{
             }
         });
 
-        // res.send('File uploaded to ' + uploadPath);
-        console.log('File uploaded to ' + uploadPath)
-        res.redirect(Now.surfing_path);
+        console.log(`File: ${targetFile.name} Size: ${(req.files.Files.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
+
+        let response = {
+            code: 200,
+            message: "file uplpoad Success"
+        }
+
+        return res.json(response)
+
+        // res.json(response)
     }
     
     
@@ -243,7 +268,7 @@ router.post('/upload', (req, res)=>{
 //比如:"http://192.168.1.144:8888/filedownload?path=E:\"
 //顺带一提 如果直接filedownload访问文件夹/硬盘 是直接会没有响应的
 
-//因此对于文件夹界面来说 才会接入filelist来调用filedownload 实际上也是调用目录给filedownlad
+//因此对于文件夹界面来说 才会接入fileslist来调用filedownload 实际上也是调用目录给filedownlad
 
 router.get('/filedownload', function (req, res) {
     //EXP:/filedownload?path=D:\All%20Local%20Downloads\
@@ -287,7 +312,7 @@ router.get('/*',(req, res)=>{
  */
 function informationList(filepath){
 
-var [informationlist,dirlist,filelist,sizelist,extlist] = [[],[],[],[],[]];
+var [informationlist,dirlist,fileslist,sizelist,extlist] = [[],[],[],[],[]];
 
 //不过神奇的是 无法使用这种解构的方法来快速定义多个空变量,只能用这种方法来快速定义多个空数组
 
@@ -301,7 +326,7 @@ var [informationlist,dirlist,filelist,sizelist,extlist] = [[],[],[],[],[]];
             }
 
             else{
-                filelist.push(encodeURIComponent(fullname));
+                fileslist.push(encodeURIComponent(fullname));
                 sizelist.push(`${fs.statSync(fullname).size}`);
                 extlist.push(path.extname(fullname).toLowerCase());
             }
@@ -309,7 +334,7 @@ var [informationlist,dirlist,filelist,sizelist,extlist] = [[],[],[],[],[]];
 
     });
     
-    informationlist.push(dirlist, filelist, sizelist, extlist)
+    informationlist.push(dirlist, fileslist, sizelist, extlist)
     return informationlist
 }
 

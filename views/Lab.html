@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/font.css' />
+</head>
+<body>
+<h1><%= title %></h1>
+<p>Welcome to <%= title %></p>
+
+<script type="text/javascript">
+    function trigger(){
+        fetch("/ping", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },//options
+            
+            //callback
+            }).then(function(res) {
+                return res.json();
+            }).then(function (data) {
+                document.querySelector('#exp1').innerHTML = data.message;
+                console.log(data)
+            });
+    }
+            
+</script>
+
+<p id="exp1" onclick="trigger()">[Post:Ping]click me to Post /ping for Response</p>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 import app from './app.js'
-import {getIPAdress, router as routes} from './routes/index.js' //因依赖获取IP地址引入
+import {getIPAdress, router as routes} from './routes/main.js' //因依赖获取IP地址引入
 import http from 'http'
 import open from 'open'
 import world from './test.cjs'

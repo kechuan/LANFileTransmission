@@ -16,7 +16,6 @@
     <script src='/js/iconfont.js'></script>
     <script src='/js/uploadSetting.js'></script>
 
-
 <!--文件夹显示效果-->
 <!-- test:D:\\All Local Downloads\\MobileFile -->
 
@@ -28,6 +27,9 @@
         </div>
         
         <form ref='uploadForm' action="/upload" id='uploadForm' method='post' encType="multipart/form-data">
+            <!-- 表单中enctype="multipart/form-data"的意思，是设置表单的MIME编码。默认情况，
+这个编码格式是application/x-www-form-urlencoded，不能用于文件上传；
+只有使用了multipart/form-data，才能完整的传递文件数据. -->
             <div class="drop-zone">
                 <div class="icon-container">
                     <img src="/images/svg/uploadFile.svg" draggable="false" class="center" alt="File Icon">
@@ -54,7 +56,7 @@
             <li>
                 <%var array = []; var string = []%>
 
-                <a href="http://<%= dataip %>/filelist?path=<% for(var j=0; j<=i; j++){%><%array.push(filepath.split('\\')[j])%><%string.push(array);string.join('\\')%><%}%><%=string[i].toString().replace(/\,/g,'\\')%>"><%= array[i] %>                  
+                <a href="http://<%= dataip %>/fileslist?path=<% for(var j=0; j<=i; j++){%><%array.push(filepath.split('\\')[j])%><%string.push(array);string.join('\\')%><%}%><%=string[i].toString().replace(/\,/g,'\\')%>"><%= array[i] %>                  
                 </a>
             </li>
             
@@ -65,7 +67,17 @@
 <div id="gap"></div>
 
 <div id="list">
+    <div id="status">
+        <div class="tiny row-gap"></div>
+        <div id="icon">？</div>
+        <div class="tiny row-gap"></div>
+        <div id="name">名称</div>
+        <div class="full row-gap"></div>
+        <div id="size">大小</div>
+
+    </div>
     <div id="files">
+
     <!-- 文件夹显示 -->
         <ul id='information'>
             <li id='name'></li>
@@ -75,80 +87,86 @@
         <ul id='dirlist'>
             <!-- 根据index.js获取的数组长度返回文件列表 -->
             <% for(var i=0; i<= dirlist.length-1; i++){ %>
-                <a href="http://<%= dataip %>/filelist?path=<%= dirlist[i] %>" class="folder" >
-                    <svg class="icons" aria-hidden="true">
-                      <use xlink:href="#directory_md"></use>
-                    </svg>
+                <div class="dirsection">
+                    <a href="http://<%= dataip %>/fileslist?path=<%= dirlist[i] %>" class="folder" >
+                        <svg class="icons" aria-hidden="true">
+                          <use xlink:href="#directory_md"></use>
+                        </svg>
 
-                    <li class="folder">  
-                        <div class="dirname"><%= dirnamelist[i] %></div>
-                        <div class="filesize">—</div>   
-                    </li>
-                </a>
-                    
+                        <li class="folder">
+                            <div class="dirname"><%= dirnamelist[i] %></div>
+                            <div class="filesize">—</div>   
+                        </li>
+                    </a>
+                </div>
             <%}%>
         </ul>
 
     <!--文件显示-->
-        <ul id='filelist'>
-            <% for(var i=0; i<= filelist.length-1; i++){ %>
-                <a href="http://<%= dataip %>/filedownload?path=<%= filelist[i] %>" class="folder"> 
-                    <svg class="icons" aria-hidden="true">
-                        <%#var filename = decodeURIComponent(filelist[i])%>
-                        <%var video_fliter = /\.mkv|mp4|flv|webv|m2ts|rmvb$/%>
-                        <%var audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac$/%>
-                        <%var picture_fliter = /\.jpe?g|png|bmp|webp$/%>
-                        <%var compress_fliter = /\.zip|rar|7z|\d{2}$/%>
-                        <%var text_fliter = /\.txt|md|lrc|ini|json|cfg$/%>
+        <ul id='fileslist'>
+            <% for(var i=0; i<= fileslist.length-1; i++){ %>
+                <div class='filesection'>
+                    <a href="http://<%= dataip %>/filedownload?path=<%= fileslist[i] %>" class="folder"> 
+                        <svg class="icons" aria-hidden="true">
+                            <%#var filename = decodeURIComponent(fileslist[i])%>
+                            <%var video_fliter = /\.mkv|mp4|flv|webv|m2ts|rmvb$/%>
+                            <%var audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac$/%>
+                            <%var picture_fliter = /\.jpe?g|png|bmp|webp$/%>
+                            <%var compress_fliter = /\.zip|rar|7z|\d{2}$/%>
+                            <%var text_fliter = /\.txt|md|lrc|ini|json|cfg$/%>
 
-                        <use xlink:href="
-                            <%if(video_fliter.test(extlist[i])){%>
-                            <%="#ext-video"%>
-                            <%}else if(audio_fliter.test(extlist[i])){%>
-                            <%="#ext-audio"%>
-                            <%}else if(picture_fliter.test(extlist[i])){%>
-                            <%="#ext-picture"%>
-                            <%}else if(text_fliter.test(extlist[i])){%>
-                            <%="#ext-txt"%>
-                            <%}else if(compress_fliter.test(extlist[i])){%>
-                            <%="#ext-compress"%>
-                            <%}else{%>
-                            <%="#ext-unknown"%>
-                            <%}%>">  
-                        </use> 
-                        
-                    </svg>
-
-                    <li class="file"> 
-                        <div class="filename">
-                            <%if(filenamelist[i].length>100){%>
-                            <% var overflow = (filenamelist[i]).slice(0,100) %>
-                            <%= `${overflow}...` %>
+                            <use xlink:href="
+                                <%if(video_fliter.test(extlist[i])){%>
+                                <%="#ext-video"%>
+                                <%}else if(audio_fliter.test(extlist[i])){%>
+                                <%="#ext-audio"%>
+                                <%}else if(picture_fliter.test(extlist[i])){%>
+                                <%="#ext-picture"%>
+                                <%}else if(text_fliter.test(extlist[i])){%>
+                                <%="#ext-txt"%>
+                                <%}else if(compress_fliter.test(extlist[i])){%>
+                                <%="#ext-compress"%>
+                                <%}else{%>
+                                <%="#ext-unknown"%>
+                                <%}%>">  
+                            </use> 
                             
+                        </svg>
 
-                            <%}else{%>
-                            <%= filenamelist[i] %>
+                        <li class="file"> 
+                            <div class="filename">
+                                <%if(filenamelist[i].length>120){%>
+                                <% var overflow = (filenamelist[i]).slice(0,120) %>
+                                <%= `${overflow}...` %>
+                                
 
-                            <%}%>
-                        </div>
+                                <%}else{%>
+                                <%= filenamelist[i] %>
 
-                        <div class="filesize">
-                            <% if(sizelist[i]<1024){ %>
-                            <%= `${sizelist[i]}B` %>
-                            <%}else if(sizelist[i]<Math.pow(1024, 2)){%>
-                            <%= `${(sizelist[i]/1024).toFixed(2)}KB`%>
-                            <%}else if(sizelist[i]<Math.pow(1024, 3)){%>
-                            <%= `${(sizelist[i]/Math.pow(1024, 2)).toFixed(2)}MB`%>
-                            <%}else{%>
-                            <%= `${(sizelist[i]/Math.pow(1024, 3)).toFixed(2)}GB`%>
-                            <%}%>
+                                <%}%>
+                            </div>
 
-                        </div>
-                    </li>
-                </a>
+                            <div class="filesize">
+                                <% if(sizelist[i]<1024){ %>
+                                <%= `${sizelist[i]}B` %>
+                                <%}else if(sizelist[i]<Math.pow(1024, 2)){%>
+                                <%= `${(sizelist[i]/1024).toFixed(2)}KB`%>
+                                <%}else if(sizelist[i]<Math.pow(1024, 3)){%>
+                                <%= `${(sizelist[i]/Math.pow(1024, 2)).toFixed(2)}MB`%>
+                                <%}else{%>
+                                <%= `${(sizelist[i]/Math.pow(1024, 3)).toFixed(2)}GB`%>
+                                <%}%>
+
+                            </div>
+                        </li>
+                    </a>
+                </div>
            
             <%}%>
         </ul>
+
+        <div id="gap"></div>
+
     </div>
 </div>
 
@@ -180,7 +198,7 @@
 
 
 
-<div id="gap"></div>
+
 
 图标展示框
 <svg class="show" aria-hidden="true">
