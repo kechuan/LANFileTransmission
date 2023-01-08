@@ -3,7 +3,6 @@ import path from 'node:path'
 import fs from "node:fs"
 import os from "node:os"
 import process from "node:process"
-import fetch from 'fetch'
 
 import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js'
 
@@ -192,11 +191,12 @@ router.post('/upload', (req, res)=>{
     let uploadPath = Now.surfing_path 
 
     uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
-    console.log("SplitPath:"+uploadPath);
+    console.log(`TargetPath:${uploadPath}`);
 
 
   //无文件传入时处理
     if (!req.files || Object.keys(req.files).length === 0) {
+        console.log("No files were uploaded.")
         return res.status(400).send('No files were uploaded.');
     }
 
@@ -251,12 +251,12 @@ router.post('/upload', (req, res)=>{
         }
 
         return res.json(response)
-
-        // res.json(response)
     }
     
     
 })
+
+
 
 
 //既然你下载是别人客户端发起的多线程下载

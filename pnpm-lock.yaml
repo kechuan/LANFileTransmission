@@ -9,10 +9,9 @@ specifiers:
   express: ^4.18.2
   express-fileupload: ^1.4.0
   express-session: ^1.17.3
-  fetch: ^1.1.0
   lowdb: ^3.0.0
   morgan: ^1.10.0
-  nodemon: ^2.0.19
+  nodemon: ^2.0.20
   open: ^8.4.0
   serve-favicon: ^2.5.0
   steno: ^2.1.0
@@ -27,7 +26,6 @@ dependencies:
   express: 4.18.2
   express-fileupload: 1.4.0
   express-session: 1.17.3
-  fetch: 1.1.0
   lowdb: 3.0.0
   morgan: 1.10.0
   open: 8.4.0
@@ -36,7 +34,7 @@ dependencies:
   url: 0.11.0
 
 devDependencies:
-  nodemon: 2.0.19
+  nodemon: 2.0.20
 
 packages:
 
@@ -89,13 +87,6 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
     dev: true
-
-  /biskviit/1.0.1:
-    resolution: {integrity: sha512-VGCXdHbdbpEkFgtjkeoBN8vRlbj1ZRX2/mxhE8asCCRalUx2nBzOomLJv8Aw/nRt5+ccDb+tPKidg4XxcfGW4w==}
-    engines: {node: '>=1.0.0'}
-    dependencies:
-      psl: 1.9.0
-    dev: false
 
   /body-parser/1.20.1:
     resolution: {integrity: sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==}
@@ -297,12 +288,6 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /encoding/0.1.12:
-    resolution: {integrity: sha512-bl1LAgiQc4ZWr++pNYUdRe/alecaHFeHxIJ/pNciqGdKXghaTCOwKkbKp6ye7pKZGu/GcaSXFk8PBVhgs+dJdA==}
-    dependencies:
-      iconv-lite: 0.4.24
-    dev: false
-
   /escape-html/1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
     dev: false
@@ -372,13 +357,6 @@ packages:
       vary: 1.1.2
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /fetch/1.1.0:
-    resolution: {integrity: sha512-5O8TwrGzoNblBG/jtK4NFuZwNCkZX6s5GfRNOaGtm+QGJEuNakSC/i2RW0R93KX6E0jVjNXm6O3CRN4Ql3K+yA==}
-    dependencies:
-      biskviit: 1.0.1
-      encoding: 0.1.12
     dev: false
 
   /filelist/1.0.4:
@@ -631,11 +609,10 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /nodemon/2.0.19:
-    resolution: {integrity: sha512-4pv1f2bMDj0Eeg/MhGqxrtveeQ5/G/UVe9iO6uTZzjnRluSA4PVWf8CW99LUPwGB3eNIA7zUFoP77YuI7hOc0A==}
+  /nodemon/2.0.20:
+    resolution: {integrity: sha512-Km2mWHKKY5GzRg6i1j5OxOHQtuvVsgskLfigG25yTtbyfRGn/GNvIbRyOf1PSCKJ2aT/58TiuUsuOU5UToVViw==}
     engines: {node: '>=8.10.0'}
     hasBin: true
-    requiresBuild: true
     dependencies:
       chokidar: 3.5.3
       debug: 3.2.7_supports-color@5.5.0
@@ -713,10 +690,6 @@ packages:
     dependencies:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
-    dev: false
-
-  /psl/1.9.0:
-    resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
     dev: false
 
   /pstree.remy/1.1.8:

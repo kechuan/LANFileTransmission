@@ -42,7 +42,7 @@ app.use(logger('dev')); //显示用户访问行为 访问资源目录 状态码 
 //上传设置
 app.use(fileUpload({
     defParamCharset: "utf8", //调整fileupload的form依赖->busboy:defParamCharset:utf8
-    limits: { fileSize: 100 * 1024 * 1024 } //Limit Size:100MB
+    limits: { fileSize: 1000 * 1024 * 1024 } //Limit Size:1000MB
     // debug:true
 })); 
 

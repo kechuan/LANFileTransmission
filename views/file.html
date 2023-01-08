@@ -15,13 +15,15 @@
     
     <script src='/js/iconfont.js'></script>
     <script src='/js/uploadSetting.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 
 <!--文件夹显示效果-->
 <!-- test:D:\\All Local Downloads\\MobileFile -->
 
     <section class="upload-container" style="visibility: hidden;">
         <div id="uploadNav">
-            <div id="closeUploadButton" onclick="visible()">
+            <div id="closeUploadButton" onclick="visible()" style="opacity: 1;">
                 <img src="/images/svg/closeButton.svg">
             </div>
         </div>
@@ -42,9 +44,39 @@
             </div>
         </form>
 
+        <!-- 进度条 -->
+        <div class="progress-container" style="visibility:hidden;">
+            <!-- 背景进度 -->
+
+            <div class="bg-progress">
+                <!-- 数值变动的进度 -->
+                <div class="inner-container">
+                    <div class="status">Upload</div>
+
+                    <div class="percent-container">
+                        <span class="percentage" id="progressPercent">0%</span>
+                    </div>
+
+                </div>
+                <div class="progress-bar" style="transform: scaleX(0);"></div>
+            </div>
+            
+        </div>
+
     </section>
 
- <div id="nav">kechuan的文件分享页面</div>
+ <div id="nav">
+    <div class="name">kechuan的文件分享页面</div>
+    <div class="toolitem">
+        <div class="NavUploadProcess">
+            <img src="/images/svg/uploadProgress.svg" title="上传进度条">
+        </div>
+        <div class="DisplaySetting">
+            <img src="/images/svg/more.svg" title="更多设置">
+        </div>
+        
+    </div>
+</div>
 
  <!-- TODO:Admin下的删除功能/通过::before ::after实现图片未加载的处理 <br>
  /继承切换视图后的scrollview位置 -->
@@ -216,6 +248,9 @@
 计划:
 图标自定义
 深浅背景间隔
+
+<div class="FotterToast" style="visibility:hidden;">Sample message</div>
+
 
 </body>
 </html>

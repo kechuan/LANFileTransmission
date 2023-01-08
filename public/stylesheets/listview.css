@@ -1,9 +1,10 @@
- ul li.folder, ul li.file {
+ul li.folder, ul li.file {
      display: flex;
      flex-direction: row;
      justify-content: space-around;
      align-items: center;
 }
+
 
 a.folder {
     display: flex;
@@ -121,7 +122,7 @@ a.folder {
 
 /*最小xxx px才不会触发 或者直接让css完全固定 @media screen*/
 
-@media (max-width: 1200px) {
+@media (max-width: 1033px) {
         body{
             /*width: 730px;*/
             width: 756px;
@@ -130,7 +131,6 @@ a.folder {
         .dirname, .filename{
             left: 11%;
         }
-
 
 }
 

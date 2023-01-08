@@ -1,0 +1,60 @@
+function XHRformDataUpload(){
+	uploadForm = $('#uploadForm') //当前form的数据
+	let formData = new FormData(uploadForm);
+   	
+   	const xhr = new XMLHttpRequest();
+
+   	xhr.upload.onprogress = function (event) {
+	    // find the percentage of uploaded
+	    let percent = Math.round((100 * event.loaded) / event.total);
+	    // progressPercent.innerText = percent;
+	    const scaleX = `scaleX(${percent / 100})`;
+	    // bgProgress.style.transform = scaleX;
+	    // progressBar.style.transform = scaleX;
+	    console.log(percent)
+  	};
+
+
+  	xhr.upload.onerror = function () {
+	    showToast(`Error in upload: ${xhr.status}.`);
+	    fileInput.value = ""; // reset the input
+  	};
+
+  // listen for response which will give the link
+  	xhr.onreadystatechange = function () {
+	    if (xhr.readyState == XMLHttpRequest.DONE) {
+	      // onFileUploadSuccess(xhr.responseText);
+	      console.log("XHR Done.")
+	      alert("Files Uploads.")
+	    }
+  	};
+	
+	xhr.open("POST", '/upload');
+  	xhr.send(formData);
+}
+
+
+
+function FetchformDataUpload(){
+	uploadForm = $('#uploadForm') //当前form的数据
+	let formData = new FormData(uploadForm);
+   	// formData.append('Files',files[0]) //?文件测试 当然 你也可以即时添加一个input 冠以其他名字进行上传
+   	
+	
+	fetch("/upload",{
+		//options
+	    method: "POST",
+	    headers: {
+		       // 'Content-Type': 'application/x-www-form-urlencoded' //解析表单数据formdata
+	    },
+	    body:formData,
+	    dataType:"text"
+	})
+			
+		//callback
+		.then((res)=>{return res.json()})
+		.then((res)=>{
+			alert(res.message)
+		})	
+		//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
+}

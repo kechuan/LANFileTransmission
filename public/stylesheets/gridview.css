@@ -19,7 +19,7 @@
 }
 
 #status, #information{
-    visibility: hidden;
+    display: none;
 }
 
 #files{
