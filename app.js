@@ -50,7 +50,7 @@ app.use(fileUpload({
 //现在session用来将当前的操作信息转存在配置文件上
 app.use(session({
     secret: 'keyboard cat',
-    resave: false,
+    resave: true,   //过期时再次申请
     saveUninitialized: true,
     cookie: { secure: false, maxAge: 800000 },
     name: 'kechuan',

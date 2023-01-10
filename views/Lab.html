@@ -26,8 +26,8 @@
             }).then(function(res) {
                 return res.json();
             }).then(function (data) {
-                document.querySelector('#exp1').innerHTML = data.message;
-                console.log(data)
+                document.querySelector('#exp1').innerHTML = `${data.ip}:${data.message}`;
+                
             });
     }
             

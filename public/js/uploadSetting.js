@@ -1,26 +1,21 @@
 const $ = document.querySelector.bind(document);
 var Initalflag = 0;
-var uploadOptions,dropzone,title,browseBtn,fileInput,fileUpload,closeUploadButton;
-var uploadForm;
-var progressContainer,progressBar,progressPercent;
-var uploadContainer;
-var body,FotterToast;
 
 window.onload = function Inital(){
 	if(!Initalflag){
-		uploadContainer = $('.upload-container')
-		dropzone = $(".drop-zone")
-		title = $(".drop-zone .title")
-		browseBtn = $("#browseBtn")
-		fileInput = $("#fileInput")
-		fileUpload = $("#fileUpload")
-		dirsection = $('.dirsection')
-		filesection = $('.filesection')
-		progressBar = $('.progress-bar')
-		progressPercent = $('#progressPercent')
-		progressContainer = $('.progress-container')
-		closeUploadButton = $('#closeUploadButton')
-		FotterToast = $('.FotterToast')
+		window.uploadContainer = $('.upload-container')
+		window.dropzone = $(".drop-zone")
+		window.title = $(".drop-zone .title")
+		window.browseBtn = $("#browseBtn")
+		window.fileInput = $("#fileInput")
+		window.progressBar = $('.progress-bar')
+		window.progressPercent = $('#progressPercent')
+		window.progressContainer = $('.progress-container')
+		window.FooterToast = $('.FooterToast')
+		window.NavUploadProcess = $('.NavUploadProcess')
+		window.DisplaySetting = $('.DisplaySetting')
+		window.setting = $('#setting')
+		window.fileslist = $("#fileslist")
 
 		/*
 		如果直接用dragover触发频率太高
@@ -46,8 +41,7 @@ window.onload = function Inital(){
 
 		dropzone.addEventListener("drop", (event) => { //dropZone监听drop行为
 			event.preventDefault(); //阻止默认事件执行——打开文件
-			
-
+	
 			dropzone.classList.remove("dragging");
 			var files = event.target.files || event.dataTransfer.files;
 			fileInput.files = files; //子属性files代表input传入的文件
@@ -55,7 +49,7 @@ window.onload = function Inital(){
 			console.log(`dragged ${files[0].name}`)
 			// XHRformDataUpload();
 			// FetchformDataUpload();
-			AxiosformDataUpload();
+			AxiosformDataUpload(files);
 			
 		})
 
@@ -74,6 +68,23 @@ window.onload = function Inital(){
 			AxiosformDataUpload();
 		})
 
+		DisplaySetting.addEventListener('click',()=>{
+			requestAnimationFrame(()=>{
+				DisplaySetting.classList.add("clicked");
+				ShowOptions();
+			})
+			
+		})
+
+		DisplaySetting.addEventListener('mouseout',()=>{
+			requestAnimationFrame(()=>{
+				DisplaySetting.classList.remove("clicked")
+			})
+			
+		})
+
+		
+
 	Initalflag = 1;
 	console.log("inital complete.")
 		
@@ -82,7 +93,7 @@ window.onload = function Inital(){
 }
 //等待DOM元素加载完毕开始执行
 
-function AxiosformDataUpload(){
+function AxiosformDataUpload(files){
 	uploadForm = $('#uploadForm') //当前form的数据
 	let formData = new FormData(uploadForm);
    	ProgressRest();
@@ -104,13 +115,29 @@ function AxiosformDataUpload(){
         
 	})
 		//callback
-		.then((res)=>{return res})
+		.then((res)=>{return res.data})
 		.then((res)=>{
 			let end = Date.now()
 			progressPercent.innerText = `Done.`;
-
-			ShowToast(res.data.message);
+			ShowToast(res.message);
 			MoveToast();
+
+			console.log(files.length)
+			for(let file of files){
+				console.log("fileDetail:",file);
+
+				let fullLocation = `${res.location}\\${file.name}`
+				let ext = authext(files[0].name.split('.').slice(-1).toString());
+				let filename = `${file.name}`;
+				let Size = authSize(file.size);
+				
+				// console.log(fullLocation,ext,filename,Size)
+				// feedback(`${res.location}\\${file.name}`,file,Name,Size)
+				feedback(fullLocation,ext,filename,Size)
+				
+				// console.log(`${res.location}\\${file.name}`)
+			}
+			
 			// alert(`${res.data.message},cost:${((end-begin)/1000).toFixed(3)}s`)
 		})
 		//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
@@ -124,11 +151,43 @@ function AxiosformDataUpload(){
 如果要实现就得强行分离这一个函数为两个独立的开与关 还是先算了罢
 */
 
+
+
+//同理
+function ShowOptions(){
+	if(setting.style['visibility']=="hidden"){
+		setting.setAttribute('style',"visibility:visible;bottom: 5%;opacity:1")
+	}
+
+	else{
+		setting.setAttribute('style',"visibility:hidden;bottom: 0%;opacity:0")
+	}
+}
+
+function showUploadContainer(){
+	if(uploadContainer.style['visibility']=="hidden"){
+		uploadContainer.setAttribute("style","visibility:visible;opacity:1;")
+	}
+	
+	else{
+		uploadContainer.setAttribute("style","visibility:hidden;opacity:0;")
+		progressContainer.setAttribute('style',"visibility:hidden;opacity:0;")
+	}
+}
+
+
+function ProgressRest(){
+	FooterToast.setAttribute('style',"bottom:20%;")
+	progressPercent.innerText = `0%`;
+	progressContainer.setAttribute('style',"visibility:visible")
+}
+
+
 function ShowToast(message){
-	FotterToast.innerHTML = message;
-	FotterToast.setAttribute('style',"visibility:visible;color:#fff");
+	FooterToast.innerHTML = message;
+	FooterToast.setAttribute('style',"visibility:visible;color:#fff");
 	setTimeout(()=>{
-		FotterToast.setAttribute('style',"visibility:hidden;background:none;color:rgba(0,0,0,0);box-shadow:none;");
+		FooterToast.setAttribute('style',"visibility:hidden;background:none;color:rgba(0,0,0,0);box-shadow:none;");
 	},2000)
 };
 
@@ -142,7 +201,7 @@ function MoveToast(){
 		}
 
 		latency = timestamp - start_timestamp	//因为真实时间戳不断更新 延迟会越来越大
-		FotterToast.style.bottom = `${Math.min(20+0.1*latency, 50)}%`
+		FooterToast.style.bottom = `${Math.min(20+0.1*latency, 50)}%`
 
 		//如果你想控制动画的速率 因为你无法控制时间戳流速 
 		//那你就只能拉长/缩短总延时大小限制 同时在变量的修改上也做相对应的拉长/缩短来控制动画速率
@@ -160,32 +219,78 @@ function MoveToast(){
 	window.requestAnimationFrame(increase);		//执行
 }
 
-function ProgressRest(){
-	FotterToast.setAttribute('style',"bottom:20%")
-	progressContainer.setAttribute('style',"visibility:visible")
-	progressPercent.innerText = `0%`;
+function authext(filename){
+
+const video_fliter = /\.mkv|mp4|flv|webv|m2ts|rmvb$/
+const audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac|cue$/
+const picture_fliter = /\.jpe?g|png|bmp|webp$/
+const compress_fliter = /\.zip|rar|7z|\d{3}$/
+const text_fliter = /\.txt|md|ini|json|cfg$/
+
+if(video_fliter.test(filename)){
+	return "#ext-video"
+}
+else if(audio_fliter.test(filename)){
+	return "#ext-audio"
+}
+else if(picture_fliter.test(filename)){
+	return "#ext-picture"
+}
+else if(text_fliter.test(filename)){
+	return "#ext-txt"
+}
+else if(compress_fliter.test(filename)){
+	return "#ext-compress"
+}
+else{
+	return "#ext-unknown"
 }
 
-function visible(){
-	if(uploadContainer.style['visibility']=="hidden"){
-		uploadContainer.setAttribute("style","visibility:visible;background-color:rgba(33, 100, 134, 0.11);box-shadow: 0px 20px 20px 0px #00000017;")
-		dropzone.setAttribute("style","border: 2px dashed var(--border-color);") //js in css的实现会产生延迟..
-		title.setAttribute("style","color:#7F7F7FAA;")
-		browseBtn.setAttribute("style","color:#2196f3")
-		closeUploadButton.setAttribute('style','opacity: 1;')
-	}
+}
+
+function authSize(Size){
+	if(Size<1024){ 
+    	return `${Size}B` 
+    }
+    else if(Size<Math.pow(1024, 2)){
+    	return `${(Size/1024).toFixed(2)}KB`
+    }
+    else if(Size<Math.pow(1024, 3)){
+    	return `${(Size/Math.pow(1024, 2)).toFixed(2)}MB`
+    }
+    else{
+    	return `${(Size/Math.pow(1024, 3)).toFixed(2)}GB`
+    }
+}
+
+function feedback(dir,ext,filename,Size){
+	let baseNode = $(".filesection")
+	let newNode = $(".filesection").cloneNode(true) //一般是第一个节点 拷贝行为:深拷贝
+	 
+	/*新节点主要需要修改:
+	1.a href指向的内容
+	2.svg use指向的格式	a href内层的icons
+	3.文件大小/名字 a href内层的file内层的filename/filesize
+	*/
 	
-	else{
-		uploadContainer.setAttribute("style","visibility:hidden;background-color:rgba(0,0,0,0);box-shadow:none;")
-		dropzone.setAttribute("style","border:none")
-		title.setAttribute("style","color:rgba(0,0,0,0)")
-		browseBtn.setAttribute("style","color:rgba(0,0,0,0)")
-		closeUploadButton.setAttribute('style','opacity: 0;')
-	}
+	
+	let newHref = baseNode.children[0];
+	let newIcon = baseNode.children[0].children[0].children[0];
+	let newName = baseNode.children[0].children[1].children[0];
+	let newSize = baseNode.children[0].children[1].children[1];
+
+	let fullPath = `/filedownload?path=${dir}`
+	console.log(ext)
+	
+	newHref.href = fullPath;
+	newIcon.href = ext //靠name.split()分辨
+	newName.textContent = filename
+	newSize.textContent = Size
+
+	$('#fileslist').appendChild(newNode)
+		
+	
+
 }
-
-
 
 //不要将获取DOM的行为写在DOM树加载完之前！ 浪费半小时时间的教训
-
-

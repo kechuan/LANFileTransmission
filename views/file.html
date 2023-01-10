@@ -21,9 +21,9 @@
 <!--文件夹显示效果-->
 <!-- test:D:\\All Local Downloads\\MobileFile -->
 
-    <section class="upload-container" style="visibility: hidden;">
+    <section class="upload-container" style="visibility: hidden;opacity: 1;">
         <div id="uploadNav">
-            <div id="closeUploadButton" onclick="visible()" style="opacity: 1;">
+            <div id="closeUploadButton" onclick="showUploadContainer()" style="opacity: 1;">
                 <img src="/images/svg/closeButton.svg">
             </div>
         </div>
@@ -140,12 +140,11 @@
                 <div class='filesection'>
                     <a href="http://<%= dataip %>/filedownload?path=<%= fileslist[i] %>" class="folder"> 
                         <svg class="icons" aria-hidden="true">
-                            <%#var filename = decodeURIComponent(fileslist[i])%>
                             <%var video_fliter = /\.mkv|mp4|flv|webv|m2ts|rmvb$/%>
-                            <%var audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac$/%>
+                            <%var audio_fliter = /\.mp3|aac|flac|ogg|opus|aiff|alac|cue$/%>
                             <%var picture_fliter = /\.jpe?g|png|bmp|webp$/%>
-                            <%var compress_fliter = /\.zip|rar|7z|\d{2}$/%>
-                            <%var text_fliter = /\.txt|md|lrc|ini|json|cfg$/%>
+                            <%var compress_fliter = /\.zip|rar|7z|\d{3}$/%>
+                            <%var text_fliter = /\.txt|md|ini|json|cfg$/%>
 
                             <use xlink:href="
                                 <%if(video_fliter.test(extlist[i])){%>
@@ -204,7 +203,7 @@
 
 
 <!-- #ext-video -->
-<div id="setting">
+<div id="setting" style="visibility:hidden;">
     <div id="viewSetting">
         <a href="/view/<% if(view=="gridview"){%><%="listview"%><%}else{%><%="gridview"%><%}%>">
             <div class='button_BG'>
@@ -219,7 +218,7 @@
         </a>
     </div>
 
-    <div id="uploadSetting" onclick="visible()">
+    <div id="uploadSetting" onclick="showUploadContainer()">
         <a>
             <div class='button_BG' id='uploadButton'>
                 <img src="/images/svg/uploadButton.svg">
@@ -229,12 +228,33 @@
 </div>
 
 
-
-
-
 图标展示框
 <svg class="show" aria-hidden="true">
   <use xlink:href="#ext-video"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-txt"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-xls"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-ppt"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-picture"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-compress"></use>
+</svg>
+
+<svg class="show" aria-hidden="true">
+  <use xlink:href="#ext-unknown"></use>
 </svg>
 
 <svg class="show" aria-hidden="true">
@@ -245,12 +265,8 @@
   <use xlink:href="#directory_md"></use>
 </svg>
 
-计划:
-图标自定义
-深浅背景间隔
 
-<div class="FotterToast" style="visibility:hidden;">Sample message</div>
-
+<div class="FooterToast" style="visibility:hidden;bottom: 20%;">Sample message</div>
 
 </body>
 </html>

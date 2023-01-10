@@ -10,6 +10,7 @@ import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js
 
 var router = express.Router();  //路由设置 开始
 
+
 var port = 8888;
 process.traceDeprecation = true
 
@@ -31,7 +32,10 @@ class prefer extends defaultConfig{
 var Now = new prefer()
 
 router.post('/ping', (req, res) => {
+var AccessIP = req.connection.remoteAddress;
+
 let response = {
+        ip: AccessIP,
         code: 200,
         message: "pong"
     }
@@ -185,6 +189,7 @@ router.get('/fileslist', function (req, res, next) {
 //引入一点css框架吧 是时候该知道怎么用那些css框架了
 
 router.post('/upload', (req, res)=>{
+    var AccessIP = req.connection.remoteAddress;
     let targetFile; //目标文件
 
     //默认指定上传目录就在当前的浏览目录里 也许很久以后才会添加自定义目录浏览
@@ -217,7 +222,7 @@ router.post('/upload', (req, res)=>{
                   return res.status(500).send(err);
                 }
 
-                console.log(`File: ${index.name} Size: ${(index.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
+                console.log(`<<<[${AccessIP}] File: ${index.name} Size: ${(index.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
                 FullNameUpload = uploadPath; //重置
             });
         }
@@ -225,6 +230,8 @@ router.post('/upload', (req, res)=>{
         // console.log('File uploaded to ' + uploadPath)
 
         let response = {
+            location: uploadPath,
+            Filenumber: targetFile.length,
             code: 200,
             message: `${targetFile.length} files uplpoad Success`
         }
@@ -243,9 +250,10 @@ router.post('/upload', (req, res)=>{
             }
         });
 
-        console.log(`File: ${targetFile.name} Size: ${(req.files.Files.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
+        console.log(`<<<[${AccessIP}] File: ${targetFile.name} Size: ${(req.files.Files.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
 
         let response = {
+            location: uploadPath,
             code: 200,
             message: "file uplpoad Success"
         }
