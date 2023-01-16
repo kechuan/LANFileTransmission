@@ -23,32 +23,35 @@ body{
 }
 
 #nav{
-    height: 2em;
+    display: flex;
+    height: 4%;
     border: 1px solid black;
     font-family: system-ui;
-    background-color: ;
-    display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5em;
 }
 
 #nav .toolitem{
     width: auto;
     display: flex;
+    gap: 0.5em;
+}
+
+.DisplaySetting,.NavUploadProcess{
+    border-radius: 6em;    
+    transition: background-color linear 0.1s;
 }
 
 .DisplaySetting{
     border-radius: 25px;
-    transition: background-color linear 0.1s;
 }
 
-.NavUploadProcess.clicked{
-    background-color: #00000080;
-}
 
-.DisplaySetting.clicked{
+.DisplaySetting.clicked, .NavUploadProcess.clicked, .Mutlicheck:hover{
     background-color: #AEB0B345;
 }
+
 
 #path{
     display: flex;
@@ -92,8 +95,6 @@ body{
 }
 
 
-
-
 #setting{
     opacity: 0;
     position: fixed;
@@ -114,6 +115,10 @@ body{
     justify-content: center;
     align-items: center;
     border-radius: 30px;
+    cursor: pointer;
+}
+
+.closeButton{
     cursor: pointer;
 }
 

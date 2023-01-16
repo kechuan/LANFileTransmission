@@ -18,7 +18,7 @@
     width: 50%;
     top: 22%;
     left: 25%;
-    z-index: 2;
+    z-index: 3;
     transition: linear 0.5s;
 
 }
@@ -33,9 +33,7 @@
 #closeUploadButton{
     height: 1.5em;
     width: 1.5em;
-    cursor: pointer;
     transition: 0.2s all ease-in;
-
 }
 
 #closeUploadButton img{

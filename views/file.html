@@ -7,6 +7,8 @@
     <link rel="stylesheet" id='view' href="/stylesheets/<%= view %>.css">
     <link rel="stylesheet" href="/stylesheets/iconfont/icons.css">
     <link rel="stylesheet" href="/stylesheets/upload.css">
+    <link rel="stylesheet" href="/stylesheets/AsyncProgressContainer.css">
+    
 
 
 </head>
@@ -23,7 +25,7 @@
 
     <section class="upload-container" style="visibility: hidden;opacity: 1;">
         <div id="uploadNav">
-            <div id="closeUploadButton" onclick="showUploadContainer()" style="opacity: 1;">
+            <div id="closeUploadButton" class="closeButton" onclick="showUploadContainer()" style="opacity: 1;">
                 <img src="/images/svg/closeButton.svg">
             </div>
         </div>
@@ -65,17 +67,35 @@
 
     </section>
 
+
  <div id="nav">
     <div class="name">kechuan的文件分享页面</div>
     <div class="toolitem">
-        <div class="NavUploadProcess">
+        <div class="Mutlicheck">
+            <img src="/images/svg/Mutlicheck.svg" title="多选">
+        </div>
+
+        <div class="NavUploadProcess" onclick="ShowProgressList()">
             <img src="/images/svg/uploadProgress.svg" title="上传进度条">
         </div>
+
         <div class="DisplaySetting">
-            <img src="/images/svg/more.svg" title="更多设置">
+            <img src="/images/svg/moreSetting.svg" title="更多设置">
         </div>
         
     </div>
+
+    <section class="progressChecker" style="visibility: hidden;opacity: 0;">
+        <div id="AsyncProgressContainer">
+            <div class="idle Board">
+                <span style="color: #40404080;">lowcolor text draw.</span>
+            </div>
+
+            <div id="closeProgressButton" class="closeButton" onclick="ShowProgressList()">
+                <img src="/images/svg/closeButton.svg">
+            </div>
+        </div>
+    </section>
 </div>
 
  <!-- TODO:Admin下的删除功能/通过::before ::after实现图片未加载的处理 <br>

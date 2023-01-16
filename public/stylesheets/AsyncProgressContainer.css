@@ -1,0 +1,45 @@
+.progressChecker{
+    position: fixed;
+    top: -20%;
+    right: 15%;
+    height: 30%;
+    width: 30%;
+    border: 1px solid black;
+    transition: all ease-in 0.5s;
+    z-index: 2;
+
+}
+
+#AsyncProgressContainer{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: #8798461E;
+}
+
+.Board{
+display: flex;
+flex-direction: column;
+width: 100%;
+height: 100%;
+overflow: hidden;
+}
+
+.idle{
+justify-content: center;
+align-items: center;
+}
+
+.busy{
+justify-content: none;
+align-items: none;
+}
+
+#closeProgressButton{
+    position: absolute;
+    bottom: 2%;
+    right: 0%;
+    height: 1.5em;
+    width: 1.5em;
+    transition: 0.2s all ease-in;
+}

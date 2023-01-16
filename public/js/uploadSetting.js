@@ -1,5 +1,7 @@
 const $ = document.querySelector.bind(document);
 var Initalflag = 0;
+var liPosition = 0; //书写位置
+
 
 window.onload = function Inital(){
 	if(!Initalflag){
@@ -16,6 +18,10 @@ window.onload = function Inital(){
 		window.DisplaySetting = $('.DisplaySetting')
 		window.setting = $('#setting')
 		window.fileslist = $("#fileslist")
+		window.NavUploadProcess = $('.NavUploadProcess');
+		window.progressChecker = $('.progressChecker')
+		window.Board = $('.Board')
+		window.Mutlicheck = $('.Mutlicheck')
 
 		/*
 		如果直接用dragover触发频率太高
@@ -43,13 +49,29 @@ window.onload = function Inital(){
 			event.preventDefault(); //阻止默认事件执行——打开文件
 	
 			dropzone.classList.remove("dragging");
+
+			 //清除idle状态
+			Board.innerHTML = '';
+			Board.classList.remove("idle");
+			Board.classList.add("busy");
+
 			var files = event.target.files || event.dataTransfer.files;
+
 			fileInput.files = files; //子属性files代表input传入的文件
 
 			console.log(`dragged ${files[0].name}`)
 			// XHRformDataUpload();
 			// FetchformDataUpload();
-			AxiosformDataUpload(files);
+			
+
+			if(files.length==1){
+				AxiosformDataUpload(files);
+			}
+			
+
+			else{
+				AsyncAxiosUpload(files);
+			}
 			
 		})
 
@@ -65,7 +87,7 @@ window.onload = function Inital(){
 
 		fileInput.addEventListener("input", () =>{
 			event.preventDefault();
-			AxiosformDataUpload();
+			AxiosformDataUpload(files);
 		})
 
 		DisplaySetting.addEventListener('click',()=>{
@@ -80,11 +102,21 @@ window.onload = function Inital(){
 			requestAnimationFrame(()=>{
 				DisplaySetting.classList.remove("clicked")
 			})
-			
 		})
 
-		
+		NavUploadProcess.addEventListener('click',()=>{
+			requestAnimationFrame(()=>{
+				NavUploadProcess.classList.add("clicked");
+				
+			})
+		})
 
+		NavUploadProcess.addEventListener('mouseout',()=>{
+			requestAnimationFrame(()=>{
+				NavUploadProcess.classList.remove("clicked")
+			})
+		})
+		
 	Initalflag = 1;
 	console.log("inital complete.")
 		
@@ -93,9 +125,100 @@ window.onload = function Inital(){
 }
 //等待DOM元素加载完毕开始执行
 
+var reqList = [];
+
+async function AsyncAxiosUpload(files){
+	let targetNode = $(".Board");
+
+    let docfrag = document.createDocumentFragment();
+
+   	for(let x = 0; x<files.length; x++){
+        let newspan = document.createElement('span');
+        newspan.innerText = `waitting...`
+        docfrag.appendChild(newspan);
+    }
+
+    targetNode.appendChild(docfrag); //预注入
+
+	postFunction(files);
+
+	let posts = await axios.all(reqList).then(axios.spread((...resList)=>{return resList}));
+	reqList = [];
+
+	//解析req请求
+
+	//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
+	
+	// console.log(posts);
+	for(let i = 0; i<posts.length; i++) { //绕过textNode
+        if (posts[i].code >= 200 && posts[i].code < 300) {
+        	targetNode.children[i].innerHTML= `${i}: ${posts[i].filename} ${posts[i].message}`;
+        }
+    }
+
+}
+
+
+function postFunction(files){
+	
+	for(let file of files){
+		
+		//你以为是li被循环 实际上其实是req被读入之后 它里面的值就被固定了
+		//这个我能理解 但为什么outer var会被连续触发3次1呢? 该放断点了家人们
+
+		uploadForm = $('#uploadForm') //当前form的数据
+		let formData = new FormData();
+		
+		formData.append('Files',file,file.name)
+
+		let req = axios.post("/upload",formData,{
+		    headers: {
+			       'Content-Type': 'multipart/form-data;charset=UTF-8'
+			},
+
+	        onUploadProgress: progressEvent => {
+	        	//progressEvent事件调用 是XHR自带的接口
+	        	let UploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+
+	        	//上传进度百分比
+	        	outsiderTrigger(files.length); //因为内部的值无法自循环 从外界函数获取值
+	        	Board.children[liPosition].innerHTML = `${file.name}:${UploadProgress}%`;
+	        	
+	      	},
+
+	      	validateStatus: status => {
+				return status >= 200 && status < 300;
+			}
+
+		})
+		.then((res)=>{
+			ShowToast(`${files.length} ${res.data.message}`);
+			MoveToast();
+			return res.data; //最后记得抛出
+		})
+
+		reqList.push(req); //循环将请求放入
+
+	}
+	
+}
+
+function outsiderTrigger(length){
+	if(liPosition==length-1){
+		liPosition = 0; //clear
+	}
+
+	else{
+		liPosition+=1;	
+	}
+	
+	return liPosition;
+}
+
 function AxiosformDataUpload(files){
 	uploadForm = $('#uploadForm') //当前form的数据
 	let formData = new FormData(uploadForm);
+	
    	ProgressRest();
 	axios.post("/upload",formData,{
 	    headers: {
@@ -122,23 +245,18 @@ function AxiosformDataUpload(files){
 			ShowToast(res.message);
 			MoveToast();
 
-			console.log(files.length)
 			for(let file of files){
-				console.log("fileDetail:",file);
+				// console.log("fileDetail:",file);
 
 				let fullLocation = `${res.location}\\${file.name}`
 				let ext = authext(files[0].name.split('.').slice(-1).toString());
 				let filename = `${file.name}`;
 				let Size = authSize(file.size);
-				
-				// console.log(fullLocation,ext,filename,Size)
-				// feedback(`${res.location}\\${file.name}`,file,Name,Size)
+		
 				feedback(fullLocation,ext,filename,Size)
-				
-				// console.log(`${res.location}\\${file.name}`)
+
 			}
 			
-			// alert(`${res.data.message},cost:${((end-begin)/1000).toFixed(3)}s`)
 		})
 		//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
 }
@@ -164,6 +282,16 @@ function ShowOptions(){
 	}
 }
 
+function ShowProgressList(){
+	if(progressChecker.style['visibility']=="hidden"){
+		progressChecker.setAttribute('style',"visibility:visible;top:5%;opacity:1")
+	}
+
+	else{
+		progressChecker.setAttribute('style',"visibility:hidden;top:-20%;opacity:0")
+	}
+}
+
 function showUploadContainer(){
 	if(uploadContainer.style['visibility']=="hidden"){
 		uploadContainer.setAttribute("style","visibility:visible;opacity:1;")
@@ -177,7 +305,7 @@ function showUploadContainer(){
 
 
 function ProgressRest(){
-	FooterToast.setAttribute('style',"bottom:20%;")
+	
 	progressPercent.innerText = `0%`;
 	progressContainer.setAttribute('style',"visibility:visible")
 }
@@ -187,7 +315,7 @@ function ShowToast(message){
 	FooterToast.innerHTML = message;
 	FooterToast.setAttribute('style',"visibility:visible;color:#fff");
 	setTimeout(()=>{
-		FooterToast.setAttribute('style',"visibility:hidden;background:none;color:rgba(0,0,0,0);box-shadow:none;");
+		FooterToast.setAttribute('style',"visibility:hidden;background:none;color:rgba(0,0,0,0);box-shadow:none;opacity:0");
 	},2000)
 };
 
@@ -273,24 +401,20 @@ function feedback(dir,ext,filename,Size){
 	3.文件大小/名字 a href内层的file内层的filename/filesize
 	*/
 	
-	
 	let newHref = baseNode.children[0];
 	let newIcon = baseNode.children[0].children[0].children[0];
 	let newName = baseNode.children[0].children[1].children[0];
 	let newSize = baseNode.children[0].children[1].children[1];
 
 	let fullPath = `/filedownload?path=${dir}`
-	console.log(ext)
 	
 	newHref.href = fullPath;
-	newIcon.href = ext //靠name.split()分辨
+	newIcon.href.baseVal = ext //靠name.split()分辨
 	newName.textContent = filename
 	newSize.textContent = Size
 
 	$('#fileslist').appendChild(newNode)
 		
-	
-
 }
 
 //不要将获取DOM的行为写在DOM树加载完之前！ 浪费半小时时间的教训

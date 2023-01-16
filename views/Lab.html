@@ -14,26 +14,103 @@
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script type="text/javascript">
-    function trigger(){
-        fetch("/ping", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },//options
-            
-            //callback
-            }).then(function(res) {
-                return res.json();
-            }).then(function (data) {
-                document.querySelector('#exp1').innerHTML = `${data.ip}:${data.message}`;
-                
-            });
+const $ = document.querySelector.bind(document);
+var reqList = [];
+
+var test1;
+var test2;
+var test3;
+
+function trigger(){
+    fetch("/ping", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },//options
+        
+        //callback
+    })
+    .then(function(res) {
+        return res.json();
+    })
+
+    .then(function (data) {
+    document.querySelector('#exp1').innerHTML = `[Fetch]: ${data.ip}:${data.message}`;
+    });
+}
+
+
+function getPosts(number){
+
+    for(let i=0;i<number;i++){
+        let req = axios.post("/ping", {
+            headers: {
+                'Content-Type': 'charset=UTF-8;'
+            }
+        })
+
+    reqList.push(req); //请求放入
+    // resList.push(`post${i+1}`)
     }
+
+    // return axios.all(reqList).then(axios.spread((...resList)=>{return resList}))
+    //并发all——等待reqList的所有请求执行完毕 
+    //然后将reqList取得的所有数据 返回到resList里
+
+    //那怎么 才能实现不用等 只要执行完毕就立刻返回呢?
+    //但是只要一旦return 那整个func就直接结束了啊??
+    
+}
+
+
+async function Asynctrigger(Number){
+    
+    let expNode = $('#exp2');
+    let docfrag = document.createDocumentFragment();
+
+    for(let x = 0; x<Number; x++){
+        let newLi = document.createElement('li');
+        newLi.innerText = `waitting...`
+        docfrag.appendChild(newLi)
+    }
+
+    expNode.appendChild(docfrag); //预注入
+
+    getPosts(Number)
+    let posts = await axios.all(reqList).then(axios.spread((...resList)=>{return resList}));
+    
+    //await等待Promise解析出data data等待reqList的post有无收到回应
+    
+
+
+    //尘埃落定的写法 
+    for(let i = 0; i<posts.length; i++) { //绕过textNode
+        if (posts[i].status >= 200 && posts[i].status < 300) {
+        expNode.children[i].innerHTML = posts[i].data.message
+        
+        }
+    }
+  
+}
+
+
+//不对 因为Promise只有那么两种状态
+//如果真的出现了依然在pending 甚至是reject的状况
+//如果document.write只有一次
+//那么被书写上去了的内容则会成为板上钉钉的事情
+
+//那么。。就得应该设立一个Listner作中间人 侦测到元素改变的时候 就将显示出来的元素重新InnerHTML一遍 就可以了?
+
             
 </script>
 
 <p id="exp1" onclick="trigger()">[Post:Ping]click me to Post /ping for Response</p>
+<p id="exp2" onclick="Asynctrigger(3)">[Post:Ping]click me to Post /ping for Response</p>
+
+
 
 </body>
 </html>

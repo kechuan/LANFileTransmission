@@ -158,7 +158,7 @@ router.get('/fileslist', function (req, res, next) {
     var dirnamelist = new Array();
 
     for (var i=0;i<fileslist.length;i++){
-        var temp = decodeURIComponent(fileslist[i])
+        var temp = fileslist[i]
         filenamelist[i] = temp.split('\\').slice(-1).toString();   
         //浅复制最后一位的slice 但是会变成数组的形式 需要手动转换一次变成字符串
     }
@@ -207,7 +207,7 @@ router.post('/upload', (req, res)=>{
 
     targetFile = req.files.Files; //此处的Files是对应着input表格当中的name属性 同样可以从req.files里看到
 
-    console.log('req.files >>>', req.files); // eslint-disable-line
+    // console.log('req.files >>>', req.files); // debug用 查看这个文件的详细信息便于开发
 
     //执行单多文件流程处理
     //处理的方式也很粗暴 直接执行for循环拆分开来一个个上传就是
@@ -226,8 +226,6 @@ router.post('/upload', (req, res)=>{
                 FullNameUpload = uploadPath; //重置
             });
         }
-        
-        // console.log('File uploaded to ' + uploadPath)
 
         let response = {
             location: uploadPath,
@@ -253,6 +251,7 @@ router.post('/upload', (req, res)=>{
         console.log(`<<<[${AccessIP}] File: ${targetFile.name} Size: ${(req.files.Files.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
 
         let response = {
+            filename:targetFile.name,
             location: uploadPath,
             code: 200,
             message: "file uplpoad Success"
@@ -334,7 +333,7 @@ var [informationlist,dirlist,fileslist,sizelist,extlist] = [[],[],[],[],[]];
             }
 
             else{
-                fileslist.push(encodeURIComponent(fullname));
+                fileslist.push(fullname); //忽然发现我为什么要在非传入url的链接上使用编码啊..
                 sizelist.push(`${fs.statSync(fullname).size}`);
                 extlist.push(path.extname(fullname).toLowerCase());
             }
