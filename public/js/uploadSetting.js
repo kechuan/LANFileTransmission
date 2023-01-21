@@ -22,6 +22,8 @@ window.onload = function Inital(){
 		window.progressChecker = $('.progressChecker')
 		window.Board = $('.Board')
 		window.Mutlicheck = $('.Mutlicheck')
+		window.dirlistNode = $('.dirlist');
+		window.fileslistNode = $('.fileslist');
 
 		/*
 		如果直接用dragover触发频率太高
@@ -116,6 +118,13 @@ window.onload = function Inital(){
 				NavUploadProcess.classList.remove("clicked")
 			})
 		})
+
+		Mutlicheck.addEventListener('click',()=>{
+			requestAnimationFrame(()=>{
+				Mutlicheck.classList.add("clicked");
+				MutlicheckMode();
+			})
+		})
 		
 	Initalflag = 1;
 	console.log("inital complete.")
@@ -126,6 +135,19 @@ window.onload = function Inital(){
 //等待DOM元素加载完毕开始执行
 
 var reqList = [];
+var selectedList = [];
+
+function MutlicheckMode(){
+	console.log('Mutlicheck Mode');
+
+	fileslistNode.addEventListener('click',()=>{
+		requestAnimationFrame(()=>{
+			fileslistNode.classList.add("clicked");
+			console.log("checked")
+		})
+	})
+
+}
 
 async function AsyncAxiosUpload(files){
 	let targetNode = $(".Board");
