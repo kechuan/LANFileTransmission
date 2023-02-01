@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="/stylesheets/upload.css">
     <link rel="stylesheet" href="/stylesheets/AsyncProgressContainer.css">
     
-
-
 </head>
 
 <body>
@@ -30,7 +28,7 @@
             </div>
         </div>
         
-        <form ref='uploadForm' action="/upload" id='uploadForm' method='post' encType="multipart/form-data">
+        <form action="/upload" id='uploadForm' method='post' encType="multipart/form-data">
             <!-- 表单中enctype="multipart/form-data"的意思，是设置表单的MIME编码。默认情况，
 这个编码格式是application/x-www-form-urlencoded，不能用于文件上传；
 只有使用了multipart/form-data，才能完整的传递文件数据. -->
@@ -116,10 +114,10 @@
         <%}%>
     </ul>
  </div> 
-<div id="gap"></div>
+<div class="gap"></div>
 
 <div id="list">
-    <div id="status">
+    <div id="status"> 
         <div class="tiny row-gap"></div>
         <div id="icon">？</div>
         <div class="tiny row-gap"></div>
@@ -216,7 +214,7 @@
             <%}%>
         </ul>
 
-        <div id="gap"></div>
+        <div class="gap"></div>
 
     </div>
 </div>

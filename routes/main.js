@@ -189,11 +189,13 @@ router.get('/fileslist', function (req, res, next) {
 //引入一点css框架吧 是时候该知道怎么用那些css框架了
 
 router.post('/upload', (req, res)=>{
-    var AccessIP = req.connection.remoteAddress;
+    let AccessIP = req.connection.remoteAddress;
     let targetFile; //目标文件
 
     //默认指定上传目录就在当前的浏览目录里 也许很久以后才会添加自定义目录浏览
-    let uploadPath = Now.surfing_path 
+    let uploadPath = Now.surfing_path; 
+    //这个措施也导致了 如果是第三方客户端试图抓取 如果无session会话这种和浏览器强相关的东西
+    //单靠一些单独的http网络库是无法上传的.. 看看能不能做一个自定义通道
 
     uploadPath = decodeURIComponent(uploadPath.split(/\?path=/g).slice(-1).toString())
     console.log(`TargetPath:${uploadPath}`);
@@ -261,6 +263,15 @@ router.post('/upload', (req, res)=>{
     }
     
     
+})
+
+//for external tool upload way
+
+//express会自动解码传入的URL(%2F etc...)编码
+router.post('/upload/:FilePath',(req,res)=>{
+    let externalFilePath = req.params.FilePath
+    console.log(`externalFilePath: ${externalFilePath}`);
+    res.end("/upload received");
 })
 
 

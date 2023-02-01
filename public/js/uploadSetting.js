@@ -1,7 +1,6 @@
 const $ = document.querySelector.bind(document);
 var Initalflag = 0;
-var liPosition = 0; //书写位置
-
+var textPosition = 0;var sideProgressBarPosition = 1;
 
 window.onload = function Inital(){
 	if(!Initalflag){
@@ -155,9 +154,22 @@ async function AsyncAxiosUpload(files){
     let docfrag = document.createDocumentFragment();
 
    	for(let x = 0; x<files.length; x++){
-        let newspan = document.createElement('span');
-        newspan.innerText = `waitting...`
-        docfrag.appendChild(newspan);
+        let filename = document.createElement('div');
+        let sideProgressBarPosition = document.createElement('div');
+
+        filename.innerText = `waitting...`;
+
+        let innerBar = sideProgressBarPosition.appendChild(filename);
+        sideProgressBarPosition.setAttribute('class','multipartProgress');
+        sideProgressBarPosition.setAttribute('style','transform:scaleX(0);');
+        
+        filename.setAttribute('class','text');
+
+        docfrag.appendChild(filename);
+        docfrag.appendChild(sideProgressBarPosition);
+
+        console.log(docfrag)
+        
     }
 
     targetNode.appendChild(docfrag); //预注入
@@ -165,16 +177,17 @@ async function AsyncAxiosUpload(files){
 	postFunction(files);
 
 	let posts = await axios.all(reqList).then(axios.spread((...resList)=>{return resList}));
-	reqList = [];
+	reqList = []; //clear reqList
 
-	//解析req请求
 
 	//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
-	
+	//不过你有async await来帮你解析promise对象
 	// console.log(posts);
+
+	//psot完毕之后的处理
 	for(let i = 0; i<posts.length; i++) { //绕过textNode
         if (posts[i].code >= 200 && posts[i].code < 300) {
-        	targetNode.children[i].innerHTML= `${i}: ${posts[i].filename} ${posts[i].message}`;
+        	targetNode.children[2*i].innerHTML= `${i+1}: ${posts[i].filename} ${posts[i].message}`;
         }
     }
 
@@ -185,9 +198,6 @@ function postFunction(files){
 	
 	for(let file of files){
 		
-		//你以为是li被循环 实际上其实是req被读入之后 它里面的值就被固定了
-		//这个我能理解 但为什么outer var会被连续触发3次1呢? 该放断点了家人们
-
 		uploadForm = $('#uploadForm') //当前form的数据
 		let formData = new FormData();
 		
@@ -202,9 +212,13 @@ function postFunction(files){
 	        	//progressEvent事件调用 是XHR自带的接口
 	        	let UploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
 
+
 	        	//上传进度百分比
-	        	outsiderTrigger(files.length); //因为内部的值无法自循环 从外界函数获取值
-	        	Board.children[liPosition].innerHTML = `${file.name}:${UploadProgress}%`;
+	        	EvenOutsiderTrigger(Board.children.length); //因为内部的值无法自循环 从外界函数获取值
+	        	OddOutsiderTrigger(Board.children.length);
+	        	// Board.children[textPosition].innerHTML = `${file.name}:${UploadProgress}%`; 应该只变动进度条 要不然性能浪费
+	        	Board.children[textPosition].innerHTML = `${file.name}:${UploadProgress}%`;
+	        	Board.children[sideProgressBarPosition].setAttribute('style',`transform:scaleX(${UploadProgress/100})`);
 	        	
 	      	},
 
@@ -213,8 +227,10 @@ function postFunction(files){
 			}
 
 		})
+
+		//该分任务完成之后:
 		.then((res)=>{
-			ShowToast(`${files.length} ${res.data.message}`);
+			ShowToast(`${file.name} ${res.data.message}`);
 			MoveToast();
 			return res.data; //最后记得抛出
 		})
@@ -225,16 +241,28 @@ function postFunction(files){
 	
 }
 
-function outsiderTrigger(length){
-	if(liPosition==length-1){
-		liPosition = 0; //clear
+function EvenOutsiderTrigger(NodeLength){
+	if(textPosition==NodeLength-2){
+		textPosition = 0; //clear
 	}
 
 	else{
-		liPosition+=1;	
+		textPosition+=2;	
 	}
 	
-	return liPosition;
+	return textPosition;
+}
+
+function OddOutsiderTrigger(NodeLength) {
+	if(sideProgressBarPosition==NodeLength-1){
+		sideProgressBarPosition = 1; //clear
+	}
+
+	else{
+		sideProgressBarPosition+=2;	
+	}
+	
+	return sideProgressBarPosition;
 }
 
 function AxiosformDataUpload(files){

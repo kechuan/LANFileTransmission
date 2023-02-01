@@ -52,6 +52,20 @@ body{
     background-color: #AEB0B345;
 }
 
+.multipartProgress{
+    width: 100%;
+    height: 100%;
+    background-color: orange;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #E9B51546;
+    transition: transform 200ms linear;
+    transform-origin: left;
+
+
+}
+
 
 #path{
     display: flex;
@@ -64,8 +78,8 @@ body{
     font: 1.2em sans-serif;
 }
 
-#gap{
-    padding: 0.8em;
+.gap{
+    padding-bottom: 0.8em;
 }
 
 #path, #list{
