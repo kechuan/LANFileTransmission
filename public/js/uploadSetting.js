@@ -35,9 +35,7 @@ window.onload = function Inital(){
 				()=>{dropzone.classList.add("dragging");}
 				//手动给该标签打上dragging 使其能应用css
 			)
-
 		});
-
 
 		dropzone.addEventListener("dragleave", (event)=>{
 			event.preventDefault();
@@ -56,7 +54,7 @@ window.onload = function Inital(){
 			Board.classList.remove("idle");
 			Board.classList.add("busy");
 
-			var files = event.target.files || event.dataTransfer.files;
+			let files = event.target.files || event.dataTransfer.files;
 
 			fileInput.files = files; //子属性files代表input传入的文件
 
@@ -174,34 +172,33 @@ async function AsyncAxiosUpload(files){
 
     targetNode.appendChild(docfrag); //预注入
 
-	postFunction(files);
+	reqListAppend(files);
 
-	let posts = await axios.all(reqList).then(axios.spread((...resList)=>{return resList}));
+	let resultList = await axios.all(reqList).then(axios.spread((...resList)=>{return resList}));
 	reqList = []; //clear reqList
 
 
 	//经典的同步与异步问题 你无法在当时等待到message回应 所以无法直接return这个值出去 但至少你还能调用行为
 	//不过你有async await来帮你解析promise对象
-	// console.log(posts);
+	// console.log(resultList);
 
 	//psot完毕之后的处理
-	for(let i = 0; i<posts.length; i++) { //绕过textNode
-        if (posts[i].code >= 200 && posts[i].code < 300) {
-        	targetNode.children[2*i].innerHTML= `${i+1}: ${posts[i].filename} ${posts[i].message}`;
+	for(let i = 0; i<resultList.length; i++) { //绕过textNode
+        if (resultList[i].code >= 200 && resultList[i].code < 300) {
+        	targetNode.children[2*i].innerHTML= `${i+1}: ${resultList[i].filename} ${resultList[i].message}`;
         }
     }
 
 }
 
-
-function postFunction(files){
+function reqListAppend(files){
 	
 	for(let file of files){
 		
 		uploadForm = $('#uploadForm') //当前form的数据
 		let formData = new FormData();
 		
-		formData.append('Files',file,file.name)
+		formData.append('Files',file,file.name) //formdata: name,fileContent,filename,?{content_type}
 
 		let req = axios.post("/upload",formData,{
 		    headers: {
@@ -210,15 +207,15 @@ function postFunction(files){
 
 	        onUploadProgress: progressEvent => {
 	        	//progressEvent事件调用 是XHR自带的接口
-	        	let UploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+	        	let uploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
 
 
 	        	//上传进度百分比
 	        	EvenOutsiderTrigger(Board.children.length); //因为内部的值无法自循环 从外界函数获取值
 	        	OddOutsiderTrigger(Board.children.length);
-	        	// Board.children[textPosition].innerHTML = `${file.name}:${UploadProgress}%`; 应该只变动进度条 要不然性能浪费
-	        	Board.children[textPosition].innerHTML = `${file.name}:${UploadProgress}%`;
-	        	Board.children[sideProgressBarPosition].setAttribute('style',`transform:scaleX(${UploadProgress/100})`);
+	        	// Board.children[textPosition].innerHTML = `${file.name}:${uploadProgress}%`; 应该只变动进度条 要不然性能浪费
+	        	Board.children[textPosition].innerHTML = `${file.name}:${uploadProgress}%`;
+	        	Board.children[sideProgressBarPosition].setAttribute('style',`transform:scaleX(${uploadProgress/100})`);
 	        	
 	      	},
 
@@ -276,9 +273,9 @@ function AxiosformDataUpload(files){
 		},
 
         onUploadProgress: progressEvent => {
-        	let UploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);		//上传进度百分比
-        	progressPercent.innerText = `${UploadProgress}%`;
-        	progressBar.setAttribute('style',`transform:scaleX(${UploadProgress/100})`);
+        	let uploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);		//上传进度百分比
+        	progressPercent.innerText = `${uploadProgress}%`;
+        	progressBar.setAttribute('style',`transform:scaleX(${uploadProgress/100})`);
         	
       	},
 
@@ -296,14 +293,12 @@ function AxiosformDataUpload(files){
 			MoveToast();
 
 			for(let file of files){
-				// console.log("fileDetail:",file);
-
 				let fullLocation = `${res.location}\\${file.name}`
 				let ext = authext(files[0].name.split('.').slice(-1).toString());
 				let filename = `${file.name}`;
 				let Size = authSize(file.size);
 		
-				feedback(fullLocation,ext,filename,Size)
+				uploadFeedback(fullLocation,ext,filename,Size)
 
 			}
 			
@@ -441,7 +436,7 @@ function authSize(Size){
     }
 }
 
-function feedback(dir,ext,filename,Size){
+function uploadFeedback(dir,ext,filename,Size){
 	let baseNode = $(".filesection")
 	let newNode = $(".filesection").cloneNode(true) //一般是第一个节点 拷贝行为:深拷贝
 	 
