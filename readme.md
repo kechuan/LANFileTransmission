@@ -119,9 +119,7 @@ Guest下 仅允许访问特定的路径 禁止上传
 
 
 
-3. 第三方免网页纯HTTP模式注入 依靠params(/upload/:externPath)的路由针对实现
-
-   实现这个应该需要将原先的代码加以复用
+3. ~~第三方免网页纯HTTP模式注入 依靠params(/upload/:externPath)的路由针对实现~~
 
 ****
 
