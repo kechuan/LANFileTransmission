@@ -204,9 +204,12 @@ router.get('/filedownload', function (req, res) {
     //[Airota&LoliHouse]%20Deaimon%20-%2008%20[WebRip%201080p%20HEVC-10bit%20AAC%20ASSx2].mkv
     //但是query本身的&%等特殊字符又会被解析 怎么办。。 那就先编码url再传输然后解压就完事
 
-    let path = req.query.path
-    let filepath = decodeURIComponent(path); //将url的ascii码信息转译回正常的编码
-    downloadFile(filepath, res, req);
+
+    // console.log(req.query.path)
+    let path = req.query.path; //req.query.path会将路径自动进行decode解码
+    // console.log(path);
+    
+    downloadFile(path, res, req);
 });
 
 //透过传递并redirect修改视图 缺点则是无法分离 如果有多个会话接入的时候
@@ -273,7 +276,10 @@ let [informationlist,dirlist,fileslist,sizelist,extlist] = [[],[],[],[],[]];
  * @param res
  */
 function downloadFile(filepath, res, req) {
-    var filename = filepath.split("\\")[-1]; //截取目录的尾部(文件名)信息
+
+    // let files = fs.readdirSync(filepath);
+
+    var filename = filepath.split("\\").slice(-1).toString(); //截取目录的尾部(文件名)信息
     res.download(filepath, filename, (err)=>{
         if (err) {
             // console.log(err.code);
@@ -282,7 +288,7 @@ function downloadFile(filepath, res, req) {
             }
         } 
         else {
-            console.log(`Send ${filename} To:${req.ip} Success`);
+            console.log(`Send ${filename} Format:${path.extname(filepath).split("\.").slice(-1).toString()} To:${req.ip} Success`);
 
         }
     });

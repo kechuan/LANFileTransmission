@@ -164,6 +164,10 @@ body{
     transition: 2s all ease-in-out;
 }
 
+.show{
+    
+}
+
 @media screen and (max-width: 900px){
     #nav{
         width: 90%;
