@@ -4,6 +4,8 @@ import fs from "node:fs"
 import os from "node:os"
 import process from "node:process"
 
+import nodeDiskInfo from 'node-disk-info'
+
 import {profileWrite,profileScan,login,preferSetting} from '../public/js/data.js'
 
 // var cookieParser = require('cookie-parser')
@@ -16,6 +18,8 @@ const reqIp = `${getIPAdress()}:${port}`;
 process.traceDeprecation = true
 
 //转变class构造存储 希望以后以账号偏好设置继承数据能够用得上 比如stat extend passport之类的操作
+
+const disks = nodeDiskInfo.getDiskInfoSync()
 
 class defaultConfig{
     constructor(){
@@ -132,7 +136,22 @@ router.get('/index', function (req, res, next) {
 
 //file页面下 渲染indexdir
 router.get('/file', function (req, res, next) {
-    res.render('indexdir', {dataip: reqIp});
+    
+    let diskList = [];
+
+    for(let disk of disks){
+        if(disk.filesystem!="本地固定磁盘"){
+            continue;
+        }
+
+        else{
+            diskList.push(disk.mounted);
+        }
+        
+    }
+
+    res.render('indexdir', {dataip: reqIp,diskList: diskList});
+
 });
 
 //文件列表 需求通过上层携带 ?path='' 以访问 直接访问无效 由file跳转以携带字样
@@ -192,6 +211,77 @@ router.post('/upload/:FilePath',(req,res)=>{
     uploadPost(req,res);
 })
 
+router.post('/delete',(req,res)=>{
+    let AccessIP = req.connection.remoteAddress;
+
+    //Array数组判断
+    if(Array.isArray(req.body.Postition)){
+        for(let pos in req.body.Postition){
+            let filepath = req.body.Postition[pos].split(/path=/g)[1].toString();
+            console.log(`[${AccessIP}] Delete File:${decodeURIComponent(filepath)}`);
+            
+            filepath = filepath.replace(/%5C/g,"%2F%2F");
+            filepath = decodeURIComponent(filepath);
+
+            fs.exists(filepath,(exists, notExists)=>{
+                if(exists){
+                    if(fs.lstatSync(filepath).isDirectory()){
+                        fs.rmdirSync(filepath);
+                    }
+
+                    else{
+                        fs.rmSync(filepath);
+                    }
+                }
+
+                if(notExists){
+                    res.status = 404;
+                }
+            })
+
+        }
+    }
+
+    else{
+        let filepath = req.body.Postition.split(/path=/g)[1];
+        console.log(`[${AccessIP}] Delete item:${decodeURIComponent(filepath)}`);
+
+        filepath = filepath.replace(/%5C/g,"%2F");
+        filepath = decodeURIComponent(filepath);
+
+        fs.exists(filepath,(exists, notExists)=>{
+            if(exists){
+                if(fs.lstatSync(filepath).isDirectory()){
+                    fs.rmdirSync(filepath);
+                }
+
+                else{
+                    fs.rmSync(filepath);
+                }
+            }
+
+            if(notExists){
+                res.status = 404;
+            }
+        })
+        
+            
+        
+        
+
+    }
+
+    
+    let response = {
+        code: res.status,
+        message: `${req.body.Postition.length}files delete Success`
+    }
+
+    return res.json(response)
+
+})
+
+
 
 //下载文件 当访问到/filedownload的时候express直接跳出下载
 //比如:"http://192.168.1.144:8888/filedownload?path=E:\"
@@ -204,8 +294,6 @@ router.get('/filedownload', function (req, res) {
     //[Airota&LoliHouse]%20Deaimon%20-%2008%20[WebRip%201080p%20HEVC-10bit%20AAC%20ASSx2].mkv
     //但是query本身的&%等特殊字符又会被解析 怎么办。。 那就先编码url再传输然后解压就完事
 
-
-    // console.log(req.query.path)
     let path = req.query.path; //req.query.path会将路径自动进行decode解码
     // console.log(path);
     
@@ -392,5 +480,18 @@ function uploadPost(req,res){
         return res.json(response)
     }
 }
+
+// function deletePost(req,res){
+//     let AccessIP = req.connection.remoteAddress;
+//     let targetFile; //目标文件
+
+//     let FileList = req.query.deleteFileList;
+
+//     if(!FileList){
+//         fs.rmSync() //根据目标名字查找对应的根目录 并删除
+//         //删除成功后 return 200
+//     }
+
+// }
 
 export {getIPAdress, router}

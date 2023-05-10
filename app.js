@@ -6,6 +6,8 @@ import logger from 'morgan'
 import ejs from 'ejs'
 import session from 'express-session'
 
+import bodyParser from "body-parser"
+
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -38,6 +40,10 @@ app.engine('.html', ejs.__express);
 */
 
 app.use(logger('dev')); //显示用户访问行为 访问资源目录 状态码 以及拖取资源的时长 是很好用的debug监控
+
+//express默认下无法解析post的params参数(即res.body内的params)
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
 
 //上传设置
 app.use(fileUpload({

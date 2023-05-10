@@ -38,36 +38,20 @@ ul li a{
     <script src='js/iconfont.js'></script>
 <div class="alldom">
     点击以访问目录
-    <ul>
+<ul>
+    <% for(let disk of diskList){ %>
         <li>
-            <a href="http://<%= dataip %>/fileslist?path=C:">
+            <a href="http://<%= dataip %>/fileslist?path=<%=disk%>">
                 <svg class="icons" aria-hidden="true">
                     <use xlink:href="#directory_md"></use>
                 </svg>
-                <span class="text">C:</span>
+                <span class="text"><%=disk%></span>
             </a>
+                
         </li>
+    <%}%>
+</ul>
 
-        <li>
-           <a href="http://<%= dataip %>/fileslist?path=D:">
-                <svg class="icons" aria-hidden="true">
-                    <use xlink:href="#directory_md"></use>
-                </svg>
-                <span class="text">D:</span>
-            </a>
-
-        </li>
-
-        <li>
-            <a href="http://<%= dataip %>/fileslist?path=E:">
-                <svg class="icons" aria-hidden="true">
-                    <use xlink:href="#directory_md"></use>
-                </svg>
-                <span class="text">E:</span>
-            </a>
-        </li>
-
-    </ul>
     </div>
 </body>
 </html>
