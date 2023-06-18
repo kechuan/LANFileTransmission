@@ -26,7 +26,7 @@ class defaultConfig{
         this.surfing_path='';
         this.view='listview';
         this.status='';
-        this.description='';      
+        this.description='';
     }
 }
 
@@ -202,6 +202,14 @@ router.get('/fileslist', function (req, res, next) {
     
 })
 
+router.post('/mkdir',(req,res)=>{
+    mkdirPost(req,res);
+})
+
+router.post('/rename',(req,res)=>{
+    renamePost(req,res);
+})
+
 router.post('/upload', (req, res)=>{
     uploadPost(req,res);
 })
@@ -212,73 +220,7 @@ router.post('/upload/:FilePath',(req,res)=>{
 })
 
 router.post('/delete',(req,res)=>{
-    let AccessIP = req.connection.remoteAddress;
-
-    //Array数组判断
-    if(Array.isArray(req.body.Postition)){
-        for(let pos in req.body.Postition){
-            let filepath = req.body.Postition[pos].split(/path=/g)[1].toString();
-            console.log(`[${AccessIP}] Delete File:${decodeURIComponent(filepath)}`);
-            
-            filepath = filepath.replace(/%5C/g,"%2F%2F");
-            filepath = decodeURIComponent(filepath);
-
-            fs.exists(filepath,(exists, notExists)=>{
-                if(exists){
-                    if(fs.lstatSync(filepath).isDirectory()){
-                        fs.rmdirSync(filepath);
-                    }
-
-                    else{
-                        fs.rmSync(filepath);
-                    }
-                }
-
-                if(notExists){
-                    res.status = 404;
-                }
-            })
-
-        }
-    }
-
-    else{
-        let filepath = req.body.Postition.split(/path=/g)[1];
-        console.log(`[${AccessIP}] Delete item:${decodeURIComponent(filepath)}`);
-
-        filepath = filepath.replace(/%5C/g,"%2F");
-        filepath = decodeURIComponent(filepath);
-
-        fs.exists(filepath,(exists, notExists)=>{
-            if(exists){
-                if(fs.lstatSync(filepath).isDirectory()){
-                    fs.rmdirSync(filepath);
-                }
-
-                else{
-                    fs.rmSync(filepath);
-                }
-            }
-
-            if(notExists){
-                res.status = 404;
-            }
-        })
-        
-            
-        
-        
-
-    }
-
-    
-    let response = {
-        code: res.status,
-        message: `${req.body.Postition.length}files delete Success`
-    }
-
-    return res.json(response)
-
+    deletePost(req,res);
 })
 
 
@@ -366,6 +308,7 @@ let [informationlist,dirlist,fileslist,sizelist,extlist] = [[],[],[],[],[]];
 function downloadFile(filepath, res, req) {
 
     // let files = fs.readdirSync(filepath);
+    let AccessIP = res.connection.remoteAddress;
 
     var filename = filepath.split("\\").slice(-1).toString(); //截取目录的尾部(文件名)信息
     res.download(filepath, filename, (err)=>{
@@ -376,7 +319,7 @@ function downloadFile(filepath, res, req) {
             }
         } 
         else {
-            console.log(`Send ${filename} Format:${path.extname(filepath).split("\.").slice(-1).toString()} To:${req.ip} Success`);
+            console.log(`>>>[${AccessIP}] Send File:${filename} Format:${path.extname(filepath).split("\.").slice(-1).toString()} To:${req.ip} Success`);
 
         }
     });
@@ -468,7 +411,7 @@ function uploadPost(req,res){
             }
         });
 
-        console.log(`<<<[${AccessIP}] File: ${targetFile.name} Size: ${(targetFile.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
+        console.log(`<<<[${AccessIP}] Received File:${targetFile.name} Size: ${(targetFile.size/Math.pow(1024, 2)).toFixed(2)}MB uploaded to ${uploadPath}`)
 
         let response = {
             filename:targetFile.name,
@@ -481,17 +424,123 @@ function uploadPost(req,res){
     }
 }
 
-// function deletePost(req,res){
-//     let AccessIP = req.connection.remoteAddress;
-//     let targetFile; //目标文件
+function renamePost(req,res) {
+let AccessIP = req.connection.remoteAddress;
 
-//     let FileList = req.query.deleteFileList;
+    // console.log(req.body)
 
-//     if(!FileList){
-//         fs.rmSync() //根据目标名字查找对应的根目录 并删除
-//         //删除成功后 return 200
-//     }
 
-// }
+    if(Array.isArray(req.body.oldName)){
+        let oldName = req.body.oldName[0];
+        let newName = req.body.newName[0]||"";
+    }
+
+    else{
+        let filepath = req.body.oldItem.split(/path=/g)[1].toString();
+        let newName = req.body.newName||"";
+
+
+        let oldItem = filepath.split("%5C");
+        oldItem[oldItem.length-1] = newName;
+
+        filepath = decodeURIComponent(filepath.split("%5C").join("/"));
+        let newPath = decodeURIComponent(oldItem.join("/"));
+
+        console.log(`[${AccessIP}] Old File:${filepath}`);
+        console.log(`[${AccessIP}] New File:${newPath}`);
+
+        fs.exists(filepath,(exists, notExists)=>{
+            if(exists){
+                if(fs.lstatSync(filepath).isDirectory()){
+                    fs.renamedirSync(filepath,newPath);
+                }
+
+                else{
+                    fs.renameSync(filepath,newPath);
+                }
+            }
+        })
+
+    }
+    
+    let response = {
+        code: res.status,
+        message: `Rename Success`
+    }
+
+    return res.json(response)
+
+}
+
+function deletePost(req,res){
+let AccessIP = req.connection.remoteAddress;
+
+    //Array数组判断
+    if(Array.isArray(req.body.Postition)){
+        for(let pos in req.body.Postition){
+            let filepath = req.body.Postition[pos].split(/path=/g)[1].toString();
+            console.log(`[${AccessIP}] Delete File:${decodeURIComponent(filepath)}`);
+            
+            filepath = filepath.replace(/%5C/g,"%2F%2F");
+            filepath = decodeURIComponent(filepath);
+
+            fs.exists(filepath,(exists, notExists)=>{
+                if(exists){
+                    if(fs.lstatSync(filepath).isDirectory()){
+                        fs.rmdirSync(filepath);
+                    }
+
+                    else{
+                        fs.rmSync(filepath);
+                    }
+                }
+
+                if(notExists){
+                    res.status = 404;
+                }
+            })
+
+        }
+    }
+
+    else{
+        let filepath = req.body.Postition.split(/path=/g)[1];
+        console.log(`[${AccessIP}] Delete item:${decodeURIComponent(filepath)}`);
+
+        filepath = filepath.replace(/%5C/g,"%2F");
+        filepath = decodeURIComponent(filepath);
+
+        fs.exists(filepath,(exists, notExists)=>{
+            if(exists){
+                if(fs.lstatSync(filepath).isDirectory()){
+                    fs.rmdirSync(filepath);
+                }
+
+                else{
+                    fs.rmSync(filepath);
+                }
+            }
+
+            if(notExists){
+                res.status = 404;
+            }
+        })
+       
+    }
+
+    
+    let response = {
+        code: res.status,
+        message: `${req.body.Postition.length}files delete Success`
+    }
+
+    return res.json(response)
+
+}
+
+
+function mkdirPost(req,res) {
+    
+}
 
 export {getIPAdress, router}
